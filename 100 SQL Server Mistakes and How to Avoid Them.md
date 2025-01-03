@@ -17,3 +17,13 @@ This file has notes from the book "100 SQL Server Mistakes and How to Avoid Them
     -  Deployment diagram and illustrates the platform that an application is deployed on.
 
   - A full description can be found at https://c4model.com.
+
+- Development standards
+  - Naming standards
+    - Always use object names that are meaningful, with a view to making your code self-documenting.
+    - Always consider database architecture, which is the design of your database, even within agile projects.
+    - Avoid using prefixes for database objects, as they can actually make objects harder to locate.
+    - Be especially careful to avoid using the sp_ prefix for stored procedures as this indicates that they are a system stored procedure, instead of a user-defined procedure.
+  - Coding standards
+    - Always make time to ensure that your data-tier application has coding standards. These should form part of your architectural efforts and should consider both stylistic choices as well as technical standards.
+    - Avoid using ordinal column numbers
