@@ -37,3 +37,14 @@ This file has notes from the book "100 SQL Server Mistakes and How to Avoid Them
 - SMALLINT and TINYINT should be used instead of INT where we do not expect values to overflow these sizes, to reduce wasted space.
 - Always use fixed-length strings to reduce storage overhead when the length of strings is consistent within a column.
 - Always use variable-length strings when the length will not be consistent.
+
+**Database design**
+
+- Relational databases join tables together using the concept of keys. There are two basic types of keys—a primary key and a foreign key.
+  - A primary key is used to uniquely identify a row in a table.
+  - A foreign key is used to point to a primary key value or a unique constraint from a secondary table.
+  - If a key has a business meaning, such as SocialSecurityNumber, then it is known as a *natural key*.
+  - If a key does not have business meaning, such as an arbitrary, incrementing number, like EmployeeID, then it is called an *artificial key*.
+  - A natural key may consist of multiple columns. If a key consists of multiple columns, it is called a *composite key*. It’s best to minimize the use of composite keys when possible.
+- Avoid using wide columns or multiple columns as a primary key, as the primary key will often become the clustered index and thus will be replicated in your nonclustered indexes and can lead to performance degradation.
+- Always use a foreign key constraint, where tables are related to each other, to avoid data consistency issues.
