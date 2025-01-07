@@ -48,3 +48,13 @@ This file has notes from the book "100 SQL Server Mistakes and How to Avoid Them
   - A natural key may consist of multiple columns. If a key consists of multiple columns, it is called a *composite key*. It’s best to minimize the use of composite keys when possible.
 - Avoid using wide columns or multiple columns as a primary key, as the primary key will often become the clustered index and thus will be replicated in your nonclustered indexes and can lead to performance degradation.
 - Always use a foreign key constraint, where tables are related to each other, to avoid data consistency issues.
+
+**T-SQL development**
+
+- NULL is not equal to NULL.
+- Avoid SELECT * in anything other than ad hoc queries, as it can cause issues with performance and code maintenance, and it’s an anti-pattern for self-documenting code.
+- Only order data if it is absolutely necessary.
+- If DISTINCT causes performance issues, consider other techniques such as  GROUP BY or ROW_NUMBER().
+- Use UNION ALL instead of UNION if duplicates are either unimportant or not possible.
+- Cursors should be avoided. They are very expensive, and in modern versions of SQL Server, there are no operations that can’t be performed via other methods.
+- Deleting many rows from a table in a single transaction can cause the transaction log to become full. Avoid this by splitting the deletion into multiple batches.
