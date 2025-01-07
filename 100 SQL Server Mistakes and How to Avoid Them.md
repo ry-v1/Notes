@@ -1,6 +1,7 @@
 This file has notes from the book "100 SQL Server Mistakes and How to Avoid Them"
 
 **C4 model**
+
 - C4 model - The C4 model is a set of architectural standard diagrams.
   - At its core, C4 contains four standard diagrams:
     - System Context diagram
@@ -20,6 +21,7 @@ This file has notes from the book "100 SQL Server Mistakes and How to Avoid Them
   - A full description can be found at https://c4model.com.
 
 **Development standards**
+
   - Naming standards
     - Always use object names that are meaningful, with a view to making your code self-documenting.
     - Always consider database architecture, which is the design of your database, even within agile projects.
@@ -58,3 +60,15 @@ This file has notes from the book "100 SQL Server Mistakes and How to Avoid Them
 - Use UNION ALL instead of UNION if duplicates are either unimportant or not possible.
 - Cursors should be avoided. They are very expensive, and in modern versions of SQL Server, there are no operations that can’t be performed via other methods.
 - Deleting many rows from a table in a single transaction can cause the transaction log to become full. Avoid this by splitting the deletion into multiple batches.
+
+**Error handling, testing, source control, and deployment**
+
+- ACID is a set of basic rules for transactions, which state that they must be atomic, consistent, isolated, and durable.
+- XACT_ABORT is used to determine if an entire transaction is terminated when low severity errors cause a statement to fail.
+- We should always write error handling for our code. Use TRY..CATCH to trap errors.
+- Use THROW and RAISERROR() to raise meaningful error messages.
+- Error severity levels, ranging from 0..24, denote the severity of an error, from informational message through to critical hardware or software failures.
+- If an application has unattended processes, consider alerting if errors are raised so that the application support team can deal with them.
+- Always keep T-SQL code in a source control repository. This will provide a version history and a rollback mechanism, as well as help streamline the development of a project with multiple developers.
+- Always write unit tests for programmable objects. Doing so will take a little more time up front but will save more time when resolving issues with bugs breaking existing functionality.
+- Use modern deployment techniques. A CI/CD pipeline can provide many benefits, including improving time to market and reducing deployment complexity.
