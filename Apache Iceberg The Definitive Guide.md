@@ -49,3 +49,23 @@
         - Depending on the volume of data, computation load, and type of workload, you can utilize one or more compute engines for this task.
         - Distributed compute engine in a processing paradigm called massively parallel processing (MPP). 
         - Examples of MPP-based compute engines are Apache Spark, Snowflake, and Dremio.
+
+#### Data Lake
+    - Data lake has the ability to leverage different compute engines for different workloads.
+    - In data lakes, there isn’t really any service that fulfills the needs of the storage engine function. 
+    - Generally, the compute engine decides how to write the data, and then the data is usually never revisited and optimized, unless entire tables or partitions are rewritten, which is usually done on an ad hoc basis.
+    - Pros
+        - Lower cost
+        - Stores data in open formats
+        - Handles unstructured data
+        - Supports ML use cases
+    - Cons
+        - Performance
+        - Lack of ACID guarantees
+        - Lots of configuration required
+
+#### The Data Lakehouse
+    - The data lakehouse architecture decouples the storage and compute from data lakes and brings in mechanisms that allow for more data warehouse–like functionality (ACID transactions, better performance, consistency, etc.).
+    - Data lakehouse is the table format providing a metadata/abstraction layer between the engine and storage for them to interact more intelligently.
+    - Table formats create an abstraction layer on top of file storage that enables better consistency, performance, and ACID guarantees when working with data directly on data lake storage.
+    - A table format is a method of structuring a dataset’s files to present them as a unified “table.”
