@@ -109,3 +109,37 @@
 
 
 ## The Architecture of Apache Iceberg
+    - The Data Layer
+        - stores the actual data of the table and is primarily made up of the datafiles themselves, although delete files are also included. 
+        - provides the user with the data needed for their query.
+        - some exceptions where structures in the metadata layer can provide a result (e.g., get me the max value for column X)
+        - Datafiles 
+            - store the data itself. 
+            - Apache Iceberg is file format agnostic.
+            - Parquet might be used for large-scale online analytical processing (OLAP) analytics. 
+            - Avro might be used for low-latency streaming analytics tables.
+        - Delete Files
+            - track which records in the dataset have been deleted.
+            - Positional delete files denote what rows have been logically deleted, by identifying the exact position in the table where the row is located.
+            - Equality delete files denote what rows have been logically deleted, by identifying the row by the values of one or more of the fields for the row.
+
+    - The Metadata Layer
+        - contains all the metadata files
+        - Manifest Files
+            - Manifest files keep track of files in the data layer (i.e., datafiles and delete files) as well as additional details and statistics about each file, such as the minimum and maximum values for a datafile’s columns.
+            - Manifest files are the files that do this tracking at the leaf level of the metadata tree.
+            - Each manifest file keeps track of a subset of the datafiles. 
+            - They contain information such as details about partition membership, record counts, and lower and upper bounds of columns that are used to improve efficiency and performance while reading the data from these datafiles.
+            - In Iceberg, manifest files are in Avro format.
+        - Manifest Lists
+            - A manifest list is a snapshot of an Iceberg table at a given point in time.
+            - A manifest list contains an array of structs, with each struct keeping track of a single manifest file.
+        - Metadata Files
+            - Manifest lists are tracked by metadata files.
+            - Each time a change is made to an Iceberg table, a new metadata file is created and is registered as the latest version of the metadata file atomically via the catalog.
+        - Puffin Files
+            - stores statistics and indexes about the data in the table that improve the performance of an even broader range of queries.
+            - The file contains sets of arbitrary byte sequences called blobs, along with the associated metadata required to analyze the blobs.
+
+    - The Catalog
+        - The central place where you go to find the current location of the current metadata pointer is the Iceberg catalog.
