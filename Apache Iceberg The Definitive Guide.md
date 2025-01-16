@@ -53,6 +53,7 @@
         - Examples of MPP-based compute engines are Apache Spark, Snowflake, and Dremio.
 
 #### Data Lake
+
     - Data lake has the ability to leverage different compute engines for different workloads.
     - In data lakes, there isn’t really any service that fulfills the needs of the storage engine function. 
     - Generally, the compute engine decides how to write the data, and then the data is usually never revisited and optimized, unless entire tables or partitions are rewritten, which is usually done on an ad hoc basis.
@@ -67,6 +68,7 @@
         - Lots of configuration required
 
 #### The Data Lakehouse
+
     - The data lakehouse architecture decouples the storage and compute from data lakes and brings in mechanisms that allow for more data warehouse–like functionality (ACID transactions, better performance, consistency, etc.).
     - Data lakehouse is the table format providing a metadata/abstraction layer between the engine and storage for them to interact more intelligently.
     - Table formats create an abstraction layer on top of file storage that enables better consistency, performance, and ACID guarantees when working with data directly on data lake storage.
@@ -75,6 +77,7 @@
     - Modern table formats took this approach of defining tables as a canonical list of files, providing metadata for engines informing which files make up the table, not which directories. This more granular approach to defining “what is a table” unlocked the door to features such as ACID transactions, time travel, and more.
 
 #### The Apache Iceberg Architecture
+
     -This metadata tree breaks down the metadata of the table into four components:
         - Manifest file - A list of datafiles, containing each datafile’s location/path and key metadata about those datafiles, which allows for creating more efficient execution plans.
         - Manifest list - Files that define a single snapshot of the table as a list of manifest files along with stats on those manifests that allow for creating more efficient execution plans.
@@ -109,6 +112,7 @@
 
 
 ## The Architecture of Apache Iceberg
+
     - The Data Layer
         - stores the actual data of the table and is primarily made up of the datafiles themselves, although delete files are also included. 
         - provides the user with the data needed for their query.
@@ -143,3 +147,29 @@
 
     - The Catalog
         - The central place where you go to find the current location of the current metadata pointer is the Iceberg catalog.
+
+## Lifecycle of Write and Read Queries
+
+    - How a query engine interacts with the iceberg components for reads and writes
+        - Catalog layer
+            - catalog is the first component that a query engine interacts with. 
+            - for reads, the engine reaches out to the catalog to learn about the current state of the table
+            - for writes, the catalog is used to adhere to the schema defined and to know about Metadata layer the table’s partitioning scheme.
+
+        - Metadata layer
+            - Each time a query engine writes something to an Iceberg table, a new metadata file is created atomically and is defined as the latest version of the metadata file.
+            - during read operations, engines will always see the latest version of the table. 
+            - Query engines interact with the manifest lists to get information about partition specifications that help them skip the nonrequired manifest files for faster performance.
+            - information from the manifest files, such as upper and lower bounds for a specific column, null value counts, and partition-specific data, is used by the engine for file pruning.
+        - Data layer
+            - Query engines filter through the metadata files to read the datafiles required by a particular query efficiently.
+            - On the write side, datafiles get written on the file storage, and the related metadata files are created and updated accordingly.
+    - Writing Queries in Apache Iceberg
+        - When a write query is initiated, it is sent to the engine for parsing. 
+        - The catalog is then consulted to ensure consistency and integrity in the data and to write the data as per the defined partition strategies. 
+        - The datafiles and metadata files are then written based on the query. 
+        - Finally, the catalog file is updated to reflect the latest metadata, enabling subsequent read operations
+    - Reading Queries in Apache Iceberg
+        - When a read query is initiated, it is sent to the query engine first. 
+        - The engine leverages the catalog to retrieve the latest metadata file location, which contains critical information about the table’s schema and other metadata files, such as the manifest list that ultimately leads to the actual datafiles. 
+        - Statistical information about columns is used in this process to limit the number of files being read, which helps improve query performance.
