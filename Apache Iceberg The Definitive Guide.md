@@ -69,46 +69,46 @@
 
 #### The Data Lakehouse
 
-    - The data lakehouse architecture decouples the storage and compute from data lakes and brings in mechanisms that allow for more data warehouse–like functionality (ACID transactions, better performance, consistency, etc.).
+    - The data lakehouse architecture decouples the storage and compute from data lakes and brings in mechanisms that allow for more data warehouse-like functionality (ACID transactions, better performance, consistency, etc.).
     - Data lakehouse is the table format providing a metadata/abstraction layer between the engine and storage for them to interact more intelligently.
     - Table formats create an abstraction layer on top of file storage that enables better consistency, performance, and ACID guarantees when working with data directly on data lake storage.
-    - A table format is a method of structuring a dataset’s files to present them as a unified “table.”
+    - A table format is a method of structuring a dataset's files to present them as a unified “table.”
     - Flaw that led to challenges with the Hive table format was that the definition of the table was based on the contents of directories, not on the individual datafiles.
     - Modern table formats took this approach of defining tables as a canonical list of files, providing metadata for engines informing which files make up the table, not which directories. This more granular approach to defining “what is a table” unlocked the door to features such as ACID transactions, time travel, and more.
 
 #### The Apache Iceberg Architecture
 
     -This metadata tree breaks down the metadata of the table into four components:
-        - Manifest file - A list of datafiles, containing each datafile’s location/path and key metadata about those datafiles, which allows for creating more efficient execution plans.
+        - Manifest file - A list of datafiles, containing each datafile's location/path and key metadata about those datafiles, which allows for creating more efficient execution plans.
         - Manifest list - Files that define a single snapshot of the table as a list of manifest files along with stats on those manifests that allow for creating more efficient execution plans.
-        - Metadata file - Files that define a table’s structure, including its schema, partitioning scheme, and a listing of snapshots.
-        - Catalog - Tracks the table location (similar to the Hive Metastore), but instead of containing a mapping of table name -> set of directories, it contains a mapping of table name -> location of the table’s most recent metadata file. Several tools, including a Hive Metastore, can be used as a catalog.
+        - Metadata file - Files that define a table's structure, including its schema, partitioning scheme, and a listing of snapshots.
+        - Catalog - Tracks the table location (similar to the Hive Metastore), but instead of containing a mapping of table name -> set of directories, it contains a mapping of table name -> location of the table's most recent metadata file. Several tools, including a Hive Metastore, can be used as a catalog.
 
 #### Key Features of Apache Iceberg
     - ACID transactions
         - Apache Iceberg uses optimistic concurrency control to enable ACID guarantees, even when you have transactions being handled by multiple readers and writers.
-        - Optimistic concurrency assumes transactions won’t conflict and checks for conflicts only when necessary, aiming to minimize locking and improve performance.
+        - Optimistic concurrency assumes transactions won't conflict and checks for conflicts only when necessary, aiming to minimize locking and improve performance.
         - This way, you can run transactions on your data lakehouse that either commit or fail and nothing in between.
         - A pessimistic concurrency model, which uses locks to prevent conflicts between transactions, assuming conflicts are likely to occur, was unavailable in Apache Iceberg at this time.
         - Concurrency guarantees are handled by the catalog, as it is typically a mechanism that has built-in ACID guarantees.
     - Partition evolution
         - With Apache Iceberg you can update how the table is partitioned at any time without the need to rewrite the table and all its data. 
-        - Since partitioning has everything to do with the metadata, the operations needed to make this change to your table’s structure are quick and cheap.
+        - Since partitioning has everything to do with the metadata, the operations needed to make this change to your table's structure are quick and cheap.
     - Hidden partitioning
         - In Iceberg, partitioning occurs in two parts: 
             - the column, which physical partitioning should be based on 
             - an optional transform to that value including functions such as bucket, truncate, year, month, day, and hour. 
             - The ability to apply a transform eliminates the need to create new columns just for partitioning.
     - Row-level table operations
-        - You can optimize the table’s row-level update patterns to take one of two forms: copy-on-write (COW) or merge-on-read (MOR). 
+        - You can optimize the table's row-level update patterns to take one of two forms: copy-on-write (COW) or merge-on-read (MOR). 
         - When using COW, for a change of any row in a given datafile, the entire file is rewritten (with the row-level changemade in the new file) even if a single record in it is updated. 
         - When using MOR, for any row-level updates, only a new file that contains the changes to the affected row that is reconciled on reads is written. This gives flexibility to speed up heavy update and delete workloads.
     - Time travel 
         - Apache Iceberg provides immutable snapshots, so the information for the table's historical state is accessible, allowing you to run queries on the state of the table at a given point in time in the past
     - Version rollback
-        - Not only does Iceberg’s snapshot isolation allow you to query the data as it is, but it also reverts the table’s current state to any of those previous snapshots.
+        - Not only does Iceberg's snapshot isolation allow you to query the data as it is, but it also reverts the table's current state to any of those previous snapshots.
     - Schema evolution
-        - Tables change, whether that means adding/removing a column, renaming a column, or changing a column’s data type.
+        - Tables change, whether that means adding/removing a column, renaming a column, or changing a column's data type.
 
 
 ## The Architecture of Apache Iceberg
@@ -130,7 +130,7 @@
     - The Metadata Layer
         - contains all the metadata files
         - Manifest Files
-            - Manifest files keep track of files in the data layer (i.e., datafiles and delete files) as well as additional details and statistics about each file, such as the minimum and maximum values for a datafile’s columns.
+            - Manifest files keep track of files in the data layer (i.e., datafiles and delete files) as well as additional details and statistics about each file, such as the minimum and maximum values for a datafile's columns.
             - Manifest files are the files that do this tracking at the leaf level of the metadata tree.
             - Each manifest file keeps track of a subset of the datafiles. 
             - They contain information such as details about partition membership, record counts, and lower and upper bounds of columns that are used to improve efficiency and performance while reading the data from these datafiles.
@@ -154,7 +154,7 @@
         - Catalog layer
             - catalog is the first component that a query engine interacts with. 
             - for reads, the engine reaches out to the catalog to learn about the current state of the table
-            - for writes, the catalog is used to adhere to the schema defined and to know about Metadata layer the table’s partitioning scheme.
+            - for writes, the catalog is used to adhere to the schema defined and to know about Metadata layer the table's partitioning scheme.
 
         - Metadata layer
             - Each time a query engine writes something to an Iceberg table, a new metadata file is created atomically and is defined as the latest version of the metadata file.
@@ -171,5 +171,26 @@
         - Finally, the catalog file is updated to reflect the latest metadata, enabling subsequent read operations
     - Reading Queries in Apache Iceberg
         - When a read query is initiated, it is sent to the query engine first. 
-        - The engine leverages the catalog to retrieve the latest metadata file location, which contains critical information about the table’s schema and other metadata files, such as the manifest list that ultimately leads to the actual datafiles. 
+        - The engine leverages the catalog to retrieve the latest metadata file location, which contains critical information about the tables schema and other metadata files, such as the manifest list that ultimately leads to the actual datafiles. 
         - Statistical information about columns is used in this process to limit the number of files being read, which helps improve query performance.
+
+## Optimizing the Performance of Iceberg Tables
+    - Compaction
+        - in the world of streaming or “real-time” data, where data is ingested as it is created, generating lots of files with only a few records in each.
+        - The solution to this problem is to periodically take the data in all these small files and rewrite it into fewer larger files
+    - Compaction Strategies
+        Strategy - Binpack 
+            - What it does - Combines files only; no global sorting (will do local sorting within tasks)
+            - Pros - This offers the fastest compaction jobs.
+            - Cons - Data is not clustered.
+        Strategy - Sort
+            - What it does - Sorts by one or more fields sequentially prior to allocating tasks (e.g., sort by field a, then within that, sort by field b)
+            - Pros - Data clustered by often queried fields can lead to much faster read times.
+            - Cons - This results in longer compaction jobs compared to binpack.
+        Strategy - z-order 
+            - What it does - Sorts by multiple fields that are equally weighted, prior to allocating tasks (X and Y values in this range are in one grouping; those in another range are in
+            another grouping)
+            - Pros - If queries often rely on filters on multiple fields, this can improve read times even further.
+            - Cons - This results in longer running compaction jobs compared to binpack.
+        - Keep in mind that compaction always honors the current partition spec, so if data from an old partition spec is rewritten, it will have the new partitioning rules applied.
+        
