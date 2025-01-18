@@ -179,18 +179,32 @@
         - in the world of streaming or “real-time” data, where data is ingested as it is created, generating lots of files with only a few records in each.
         - The solution to this problem is to periodically take the data in all these small files and rewrite it into fewer larger files
     - Compaction Strategies
-        Strategy - Binpack 
+        Binpack 
             - What it does - Combines files only; no global sorting (will do local sorting within tasks)
             - Pros - This offers the fastest compaction jobs.
             - Cons - Data is not clustered.
-        Strategy - Sort
+        Sort
             - What it does - Sorts by one or more fields sequentially prior to allocating tasks (e.g., sort by field a, then within that, sort by field b)
             - Pros - Data clustered by often queried fields can lead to much faster read times.
             - Cons - This results in longer compaction jobs compared to binpack.
-        Strategy - z-order 
+        z-order 
             - What it does - Sorts by multiple fields that are equally weighted, prior to allocating tasks (X and Y values in this range are in one grouping; those in another range are in
             another grouping)
             - Pros - If queries often rely on filters on multiple fields, this can improve read times even further.
             - Cons - This results in longer running compaction jobs compared to binpack.
-        - Keep in mind that compaction always honors the current partition spec, so if data from an old partition spec is rewritten, it will have the new partitioning rules applied.
-        
+    - Keep in mind that compaction always honors the current partition spec, so if data from an old partition spec is rewritten, it will have the new partitioning rules applied.
+    - Partitioning
+        - When a table is partitioned, instead of just sorting the order based on a field, it will write records with distinct values of the target field into their own datafiles.
+    - Hidden Partitioning
+        - Instead of tracking it by relying on how files are physically laid out, Iceberg tracks the range of partition values at the snapshot and manifest levels
+    - Partition Evolution
+        - the metadata tracks not only partition values but also historical partition schemes, allowing the partition schemes to evolve. 
+    - Row-level update modes in Apache Iceberg
+        - Copy-on-write: 
+            - In this approach, if even a single row in a datafile is updated or deleted, that datafile is rewritten, and the new file takes its place in the new snapshot.
+            - Fastest reads, Slowest updates/deletes
+        - Merge-on-read 
+            - Instead of rewriting an entire datafile, you capture in a delete file the records to be updated in the existing file, with the delete file tracking which records should be ignored.
+            - Merge-on-read (position deletes): Fast reads, Fast updates/deletes, Use regular compaction to minimize read costs.
+            - Merge-on-read (equality deletes): Slow reads,  Fastest updates/deletes, Use more frequent compaction to minimize read costs.
+
