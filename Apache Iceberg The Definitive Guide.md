@@ -207,4 +207,12 @@
             - Instead of rewriting an entire datafile, you capture in a delete file the records to be updated in the existing file, with the delete file tracking which records should be ignored.
             - Merge-on-read (position deletes): Fast reads, Fast updates/deletes, Use regular compaction to minimize read costs.
             - Merge-on-read (equality deletes): Slow reads,  Fastest updates/deletes, Use more frequent compaction to minimize read costs.
-
+    - Write Distribution Mode
+        - how the data is distributed among tasks
+        - Write Distribution Mode options:
+            - none : There is no special distribution. This is the fastest during write time and is ideal for presorted data.
+            - hash : The data is hash-distributed by partition key.
+            - range : The data is range-distributed by partition key or sort order.
+    - Datafile Bloom Filters
+        - A bloom filter is a way of knowing whether a value possibly exists in a dataset.
+        - Bloom filters are handy because they can help us avoid unnecessary data scans.
