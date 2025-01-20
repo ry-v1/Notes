@@ -216,3 +216,36 @@
     - Datafile Bloom Filters
         - A bloom filter is a way of knowing whether a value possibly exists in a dataset.
         - Bloom filters are handy because they can help us avoid unnecessary data scans.
+
+## Iceberg Catalogs
+    - Hadoop Catalog
+        - Hadoop catalog is that it doesn’t require any external systems to run. All it requires is a filesystem, thereby lowering the barrier to getting started with Iceberg.
+        - it is not recommended for production usage.
+    - Hive Catalog
+        - It maps a table's path to its current metadata file by using the location table property in the table's entry in the Hive Metastore. The value of this property is the absolute path in the filesystem where the table's current metadata file can be located.
+        - it is compatible with a wide variety of engines and tools, it is cloud agnostic.
+        - it requires running an additional service yourself. 
+        - it doesn't provide support for multitable transactions.
+    - AWS Glue Catalog
+        - It utilizes the AWS Glue Data catalog as a centralized metadata repository to track Iceberg table metadata. 
+        - It maps a table's path to its current metadata file as a table property called metadata_location in the table's entry in Glue. The value for this property is the absolute path to the metadata file in the filesystem.
+        - it does not support multitable transactions.
+    - Nessie Catalog
+        - a table's path is mapped to its current metadata file using a table property called metadataLocation stored within the table's entry in Nessie. This property's value is the absolute path of the current metadata file for the table.
+        - it introduces a Git-like experience to data lakes and enables the concept of “data as code”
+        - it enables multitable and multistatement transactions like a data warehouse does. 
+        - it's cloud agnostic
+        - not all engines and tools support Nessie as a catalog.
+    - REST Catalog
+        - REST catalog is an interface rather than a specific implementation.
+        - it requires fewer packages and dependencies compared to other catalogs, simplifying deployment and management.
+        - REST catalog supports multitable transactions, offering flexibility for complex operations across multiple tables.
+        - it's cloud agnostic
+        - you have to run a process to handle and respond to the REST calls from engines and tools.
+    - JDBC Catalog
+        - The JDBC catalog maps a table's path to its current metadata file via a table property called metadata_location in the JDBC-compliant database, storing the location of the current metadata file for the table.
+        - it doesn't support multitable transactions. 
+        - it requires all your engines and tools to either package a JDBC driver with its deployment or be able to pull one in dynamically, increasing the dependencies on your deployment.
+    - Catalog Migration
+        - A nice thing about the migration being lightweight is that you can continue using your current catalog, register a set of tables in the new catalog, keep the entry in your current catalog, and do testing on the new catalog. 
+        - In this situation that the new catalog's entry will be stale, with any changes made to the table using the current catalog. You shouldn't make any changes to the table using the new catalog, as all existing usage of the current catalog won't see those changes.
