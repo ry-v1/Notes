@@ -249,3 +249,73 @@
     - Catalog Migration
         - A nice thing about the migration being lightweight is that you can continue using your current catalog, register a set of tables in the new catalog, keep the entry in your current catalog, and do testing on the new catalog. 
         - In this situation that the new catalog's entry will be stale, with any changes made to the table using the current catalog. You shouldn't make any changes to the table using the new catalog, as all existing usage of the current catalog won't see those changes.
+
+## Apache Iceberg in Production
+    - history Metadata Table
+        - made_current_at : represents the exact timestamp when the corresponding snapshot was made the current snapshot. This gives you a precise temporalmarker for when changes to the table were committed.
+        - snapshot_id : serves as a unique identifier for each snapshot. This identifier enables you to track and reference specific snapshots within the table's history.
+        - parent_id : provides the unique ID of the parent snapshot of the current snapshot. This effectively maps out the lineage of each snapshot, thus facilitating the tracking of the table's evolution over time.
+        - is_current_ancestor : indicates whether a snapshot is an ancestor of the table's current snapshot. This boolean value (true or false) helps identify snapshots that are part of the table's present state lineage and those that have been invalidated from table rollbacks.
+
+    - metadata_log_entries Metadata Table
+        - timestamp : records the exact date and time when the metadata was updated. This timestamp serves as a temporal marker for the state of the table at that specific moment.
+        - file : indicates the location of the datafile that corresponds to that particular metadata log entry. This location acts as a reference point to access the actual data associated with the metadata entry.
+        - latest_snapshot_id : provides the identifier of the most recent snapshot at the time of the metadata update. It is a useful reference point for understanding the state of the data when the metadata was updated.
+        - latest_schema_id : contains the ID of the schema being used when the metadata log entry was created. This gives context about the structure of the data at the time of the metadata update.
+        - latest_sequence_number field signifies the order of the metadata updates. It's an incrementing count that helps track the sequence of metadata changes over time.
+    
+    - snapshots Metadata Table
+        - committed_at : signifies the precise timestamp when the snapshot was created, giving an indication of when the snapshot and its associated data state were committed.
+        - snapshot_id : is a unique identifier for each snapshot. This field is crucial for distinguishing between the different snapshots and for specific operations such as snapshot retrieval or deletion.
+        - operation : lists a string of the types of operations that occurred, such as APPEND and OVERWRITE.
+        - parent_id : links to the snapshot ID of the snapshot's parent, providing context about the lineage of snapshots and allowing for the reconstruction of a historical sequence of snapshots.
+        - manifest_list : offers detailed insights into the files comprising the snapshot. It's like a directory or inventory that keeps a record of all the datafiles associated with a given snapshot.
+        - summary : holds metrics about the snapshot, such as the number of added or deleted files, number of records, and other statistical data that provides a quick glance into the snapshot's content.
+    
+    - files Metadata Table : showcases the current datafiles within a table and furnishes detailed information about each of them, from their location and format to their content and partitioning specifics.
+        - content : represents the type of content in the file, with a 0 signifying a datafile, 1 a position delete file, and 2 an equality delete file.
+        - file_path : gives the exact location of each file. This helps facilitate access to each datafile when needed.
+        - file_format : indicates the format of the datafile; for instance, whether it's a Parquet, Avro, or ORC file.
+        - spec_id : corresponds to the partition spec ID that the file adheres to, providing a reference to how the data is partitioned.
+        - partition : provides a representation of the datafile's specific partition, indicating how the data within the file is divided for optimized access and query performance.
+        - record_count : reports the number of records contained within each file, giving a measure of the file's data volume.
+        - file_size_in_bytes : provides the total size of the file in bytes, while column_sizes furnishes the sizes of the individual columns.
+        - value_counts, null_value_counts, and nan_value_counts : provide the count of non-null, null, and NaN (Not a Number) values, respectively, in each column.
+        - lower_bounds and upper_bounds : hold the minimum and maximum values in each column, providing essential insights into the data range within each file.
+        - key_metadata : contains implementation-specific metadata, if any exists.
+        - split_offsets : provides the offsets at which the file is split into smaller segments for parallel processing.
+        - equality_ids and sort_order_id : correspond to the IDs relating to equality delete files, if any exist, and the IDs of the table's sort order, if it has one.
+    
+    - manifests Metadata Table
+        - path : provides the filepath where the manifest is stored, enabling quick access to the file. 
+        - length : on the other hand, shows the size of the manifest file.
+        - partition_spec_id : indicates the specification ID of the partition that the manifest file is associated with, which is valuable for tracking changes in partitioned tables. 
+        - added_snapshot_id : provides the ID of the snapshot that added this manifest file, offering a link between snapshots and manifests.
+        - added_data_files_count, existing_data_files_count, and deleted_data_files_count : respectively relay the number of new files added in this manifest, the number of existing datafiles that were added in previous snapshots, and the number of files deleted in this manifest. 
+        - partition_summaries : is an array of field_summary structs that summarize partition-level statistics. It contains the following information: contains_null, contains_nan, lower_bound, and upper_bound. These fields indicate whether the partition contains null or NaN values, and they provide the lower and upper bounds of data within the partition.
+    
+    - partitions Metadata Table
+        - partition : represents the actual partition values, usually based on certain columns of your data. This allows your data to be organized in a meaningful way and enables efficient query processing as data can be retrieved based on specific partition values.
+        - record_count : indicates the total number of records within a given partition. This metric can be helpful in understanding data distribution across the partitions and can guide optimization strategies such as repartitioning and rebalancing.
+        - file_count : gives the total number of datafiles present in the partition. It's crucial in managing and optimizing storage, as having too many small files can impact query performance.
+        - spec_id : corresponds to the ID of the partition specification used to generate this partition. Partition specifications define how the data is split into partitions, and having the ID readily available aids in understanding the partitioning strategy used.
+        - position_delete_record_count, position_delete_file_count, equality_delete_record_count, and equality_delete_file_count
+
+    - all_data_files Metadata Table : provides comprehensive details about every datafile across all valid snapshots in the table.
+        - content : signifies the type of the file. A value of 0 indicates a datafile, 1 a position delete file, and 2 an equality delete file.
+        - file_path : is a string that represents the complete path to the datafile. This usually includes the storage system location (e.g., s3://my-bucket/folder/subfolder/myfile.xyz), the table name, and the unique file identifier.
+        - file_format : indicates the format of the datafile. In our example, it's Parquet, but it could be another file format such as AVRO or ORC.
+        - spec_id : corresponds to the ID of the partition specification used to generate this partition.
+        - partition : represents the partition to which this datafile belongs. It's usually based on the partitioning scheme defined for the table.
+        - record_count : gives the total number of records within the file, while file_size_in_bytes represents the size of the datafile in bytes. Both metrics are essential for understanding the volume of data and can be used in query optimization strategies.
+        - column_sizes : provides a map between the column ID and the size of that column in bytes.
+        - value_counts : gives a map that represents the total count of values for each column in the datafile. 
+        - null_value_counts and nan_value_counts provide a count of null and NaN values for each column.
+        - lower_bounds and upper_bounds : are maps that store the minimum and maximum values for each column in the datafile. These fields are instrumental in pruning data during query execution.
+        - key_metadata : contains implementation-specific metadata.
+        - split_offsets : provides information about split points within the file. It's an array of long values and is especially useful in distributed processing scenarios, where datafiles can be split into smaller chunks for parallel processing.
+        - equality_ids : relates to equality deletes and helps in identifying rows deleted by equality deletes.
+        - sort_order_id : contains the ID of the sort order used to write the datafile.
+        - readable_metrics : is a derived field that provides a human-readable representation of the file's metadata including column size, value counts, null counts, and lower and upper bounds.
+
+    
