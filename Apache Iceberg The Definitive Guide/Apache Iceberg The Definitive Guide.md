@@ -317,5 +317,40 @@
         - equality_ids : relates to equality deletes and helps in identifying rows deleted by equality deletes.
         - sort_order_id : contains the ID of the sort order used to write the datafile.
         - readable_metrics : is a derived field that provides a human-readable representation of the file's metadata including column size, value counts, null counts, and lower and upper bounds.
-
+       
+       - all_data_files metadata table may produce more than one row per datafile because a file could be part of multiple table snapshots.
     
+    - all_manifests Metadata Table : provides detailed insights into every manifest file across all valid snapshots in the table.
+        - content : signifies the type of the file, similar to the all_data_files table. A value of 0 indicates the manifest tracks datafiles; a value of 1 indicates that it tracks delete files.
+        - path : is a string representing the complete path to the manifest file. Like the all_data_files table, this includes the storage system location (e.g., s3://...), the table name, and a unique file identifier.
+        - length : represents the size of the manifest file in bytes. This can provide insights into the volume of metadata stored in the manifest.
+        - partition_spec_id : corresponds to the ID of the partition specification used to write this manifest file. This indicates how the datafiles listed in the manifest are partitioned.
+        - added_snapshot_id : represents the ID of the snapshot when the manifest was created.
+        - added_data_files_count, existing_data_files_count, and deleted_data_files_count : provide a summary of the changes in datafiles that this manifest file represents. 
+        - added_delete_files_count, existing_delete_files_count, and deleted_delete_files_count : provide a similar summary for delete files.
+        - partition_summaries : is an array of structures, where each structure provides a summary for a specific partition in the manifest file. Each structure indicates whether the partition contains null or NaN values, as well as the lower and upper bounds of the partition.
+        - reference_snapshot_id : represents the ID of the snapshot that this record is associated with. You'll see a manifest listed once for each snapshot it was valid for.
+
+    - refs Metadata Table : provides a list of all the named references within an Iceberg table. Named references can be thought of as pointers to specific snapshots of the table data, providing an ability to bookmark or version the table state.
+        - name : represents the unique identifier for a named reference. Named references are categorized into two types, which brings us to the second field, type. The type can be one of two values: BRANCH, a mutable reference that can be moved to a new snapshot; or TAG, an immutable reference that, once created, always points to the same snapshot.
+        - max_reference_age_in_ms : indicates the maximum duration in milliseconds that a snapshot can be referenced. This age is measured from the time the snapshot was added to the table. If the age of a snapshot exceeds this duration, it will no longer be valid and will be a candidate for cleanup during maintenance operations.
+        - min_snapshots_to_keep : provides a lower limit on the number of snapshots to keep in the table history. The Iceberg table will always maintain at least this many snapshots, even if they are older than the max_snapshot_age_ms setting.
+        - max_snapshot_age_in_ms : indicates the maximum age in milliseconds for any snapshot in the table. Snapshots that exceed this age could be removed by the maintenance operations, unless they are protected by the min_snapshots_to_keep setting.
+
+    - entries Metadata Table : offers insightful details about each operation that has been performed on the table's data and deletes files across all snapshots. Each row in this table captures operations that affected many files at a certain point in the table's history, making it an essential resource for understanding the evolution of your dataset.
+        - status : is an integer that indicates whether a file was added or deleted in the snapshot. A value of 0 represents an existing file, while 1 indicates an added file and 2 a deleted file. This field allows you to track the lifecycle of each file, providing a glimpse into the changes and modifications the dataset has undergone over time.
+        - snapshot_id : is the unique identifier of the snapshot in which the operation took place. This ID allows you to connect each file operation to a particular snapshot, which can be beneficial in tracking changes made in specific versions of the table.
+        - sequence_number : indicates the order of operations. This is a global counter across all snapshots of the table, and it increments for each change made, whether the change is an addition, a modification, or a deletion. By understanding the sequence number, you can reconstruct the exact series of operations that led to the current state of the table.
+        - data_file : is a struct that encapsulates extensive details about the file involved in the operation. The struct includes fields such as the following:
+            - file_path : The complete path to the file in the storage system
+            - file_format : The format of the file, such as Parquet or AVRO
+            - partition : Information about the partition the file belongs to
+            - record_count : The total number of records in the file
+            - file_size_in_bytes : The size of the file in bytes
+            - column_sizes : A map of the size in bytes of each column
+            - value_counts : A map with a count of total values in each column
+            - null_value_counts : A map with a count of null values in each column
+            - nan_value_counts : A map with a count of NaN values in each column
+            - lower_bounds and upper_bounds : Maps containing the minimum and maximum values of each column
+            - key_metadata : Implementation-specific metadata
+            - split_offsets : Information about split points within the file
