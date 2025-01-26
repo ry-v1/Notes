@@ -354,3 +354,43 @@
             - lower_bounds and upper_bounds : Maps containing the minimum and maximum values of each column
             - key_metadata : Implementation-specific metadata
             - split_offsets : Information about split points within the file
+
+    - Isolation of Changes with Branches
+        - at the table level, which is native to Apache Iceberg regardless of catalog.
+            - isolating changes at the table level, involves creating branches for specific tables. 
+            - Each branch contains a full history of changes made to that table. 
+            - This approach allows for concurrent schema evolution, rollbacks, and other advanced use cases. 
+            - It is a powerful tool for handling table-specific changes, but it lacks the ability to provide a holistic view of changes across the entire data catalog.
+        - at the catalog level, which is possible when using the Project Nessie catalog.
+            - Isolating changes at the catalog level allows you to manage a complete data lake as a single entity, capturing changes across multiple tables within a branch. 
+            - Using Nessie, you can take a snapshot of the entire catalog at a particular point in time.
+            - This practice facilitates a more comprehensive version control strategy, enabling you to test data transformations, track data lineage, and maintain data integrity across multiple tables.
+
+        - Table-level isolation provides granular control and flexibility for individual tables but might become complex to manage in a large-scale data environment. 
+        - Catalog-level isolation provides a comprehensive, unified view of changes but might be overkill for small-scale or single-table scenarios.
+
+    - Table Branching  
+        - ability for the metadata to track snapshots under different paths, known as branching
+
+    - Table Tagging
+        - ability to give particular snapshots a name, known as tagging.
+
+    - Catalog branching
+        - By creating a new branch, you can safely ingest and validate batches of data across multiple tables, reducing the risk of erroneous entries across your catalog of tables.
+    
+    - Catalog tagging
+        - allows you to mark specific versions of your data, providing an easy way to track and reproduce states of the data at different points in time.
+    
+    - Multitable Transactions
+        - In a multitable transaction, multiple operations, possibly involving different tables, are treated as a single atomic unit of work. 
+        - This means that either all operations in the transaction succeed, or if any operation fails, all the changes made within that transaction are rolled back, thereby leaving the database in a consistent state.
+
+    - Rolling Back at the Table Level
+        - Table-level rollbacks are a specific data management technique that allows changes to a table to be reversed or “rolled back” to a previous state.
+        - rollback_to_snapshot
+        - rollback_to_timestamp
+        - set_current_snapshot
+        - cherrypick_snapshot
+
+    - Rolling Back at the Catalog Level
+        - Nessie as Apache Iceberg catalog has the ability to roll back data at the catalog level.
