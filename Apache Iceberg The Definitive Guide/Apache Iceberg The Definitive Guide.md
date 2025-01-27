@@ -394,3 +394,31 @@
 
     - Rolling Back at the Catalog Level
         - Nessie as Apache Iceberg catalog has the ability to roll back data at the catalog level.
+
+## Streaming with Apache Iceberg
+
+    - Streaming with Spark
+        - Fault tolerance
+            - Spark Streaming is designed to be resilient to failures, with built-in recovery mechanisms. If a node goes down during a computation, the system can recover quickly and continue processing.
+        - Integration
+            - Spark Streaming integrates seamlessly with other Spark components such as Spark MLlib and Spark SQL, enabling powerful combined use cases. For example, you can use MLlib to build a machine learning (ML) model on a large dataset with Spark and then apply that model to a live data stream with Spark Streaming.
+        - Real-time processing
+            - Spark Streaming can process live data streams in real time. It divides incoming data into batches, which are then processed by the Spark engine to generate the final stream of results in batches.
+        - Window operations 
+            - Spark Streaming provides windowed computations, where transformations on Resilient Distributed Datasets (RDDs), Spark's fundamental data structure, can be applied over a sliding window of data. This is useful in many scenarios, such as computing trends over the last few hours in a data stream.
+        - High throughput
+            - Spark Streaming is designed to process a large amount of data, making it suitable for applications that need to process high-volume live data streams.
+        - Multiple data sources
+            - Spark Streaming can ingest data from various sources, including Kafka, Flume, and Kinesis, among others.
+
+        - Apache Spark's microbatching approach sets it apart from other streaming engines, making it a compelling choice for real-time data processing. 
+        - This approach involves processing data in small, discrete batches rather than handling each data point individually. 
+        - This design decision represents a trade-off between factors such as latency, throughput, and cost.
+
+        - Streaming into Iceberg with Spark
+            - A key feature of this integration is the support for processing incremental data, which starts from a historical timestamp. 
+            - Only append snapshots are supported in the context of streaming reads from an Iceberg table.
+            - Iceberg supports two output modes: append, which appends rows of every microbatch to the table; and complete, which replaces the table contents at each microbatch.
+        - Streaming from Iceberg with Spark
+            - For streaming read operations from an Iceberg table, its essential to note that Iceberg only supports reading data from append snapshots.
+            
