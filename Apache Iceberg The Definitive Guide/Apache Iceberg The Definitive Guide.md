@@ -422,3 +422,48 @@
         - Streaming from Iceberg with Spark
             - For streaming read operations from an Iceberg table, its essential to note that Iceberg only supports reading data from append snapshots.
             
+    - Streaming with Flink
+        - Event time processing 
+            - Flink's event time processing feature allows it to handle out-of-order data and provide accurate results, which is crucial for many real-time applications. This is particularly useful in scenarios where the order of events matters, such as in financial transactions and sensor data processing.
+        - Fault tolerance
+            - Like Spark, Flink provides fault tolerance through its checkpointing and save-point mechanism. These features ensure that data is not lost during processing and allow for recovery from failures without data loss.
+        - Backpressure handling
+            - Flink handles backpressure, which occurs when data is produced more quickly than it can be consumed. This ensures the stability of the system even when facing a large influx of data.
+        - High throughput and low latency
+            - Flink is designed to process large volumes of data with low latency, making it suitable for applications that require real-time insights.
+        - Windowing and complex event processing
+            - Flink provides flexible windowing based on time, count, session, and more. Additionally, it supports complex event processing (CEP), which allows for pattern detection and selection in data streams.
+        - Integration
+            - Flink integrates with a variety of data sources and sinks, including Kafka, the Hadoop Distributed File System (HDFS), and databases such as Cassandra.
+        - Exactly-once semantics
+            - Flink supports exactly-once processing semantics, ensuring that each record will be processed exactly once, thereby delivering accurate results.
+
+        - Apache Iceberg provides robust support for both streaming and batch read operations using Apache Flink's DataStream API and Table API.
+    
+    - Streaming with Kafka Connect
+        - High throughput
+            - Kafka Connect can facilitate the transfer of vast volumes of data effectively. It is designed to work seamlessly with Apache Kafka to ensure efficient data streaming between systems.
+        - Fault tolerance
+            - Kafka Connect is built to be resilient. It can automatically manage failures, ensuring uninterrupted data flow between different systems and Apache Kafka.
+        - Real-time integration
+            - With Kafka Connect, data can be integrated in real time, enabling systems to remain synchronized and up to date.
+        - Durability
+            - Kafka Connect works with Kafka topics, where each record is stored on disk and replicated for fault tolerance. This ensures that even if there's a hiccup, data remains consistent and intact.
+        - Wide integration
+            - Kafka Connect supports a vast ecosystem of connectors, making it easy to integrate with various systems, databases, and applications. Whether you need to pull data from a database into Kafka or push data from Kafka into a cloud storage solution, there's likely a connector that fits your needs.
+        - Exactly-once semantics
+            - Just like Apache Kafka, Kafka Connect supports exactly-once processing semantics, ensuring that each record is delivered exactly once, avoiding data duplication or loss.
+        - Connector framework
+            - Kafka Connect provides a framework for building and running reusable connectors, which can be used to stream data between Apache Kafka and other systems, without requiring any code changes to Kafka itself.
+
+        - The Iceberg Kafka Sink
+            - Commit coordination
+                - Centralized Iceberg commits ensure consistency and atomicity in data writes.
+            - Exactly-once delivery semantics
+                - Exactly-once delivery semantics ensure that data is processed and written to Iceberg tables exactly once, even in the presence of failures.
+            - Multitable fanout
+                - Writing data to multiple Iceberg tables based on specific routing criteria allows for flexible data distribution.
+            - Row mutations
+                - Support for row mutations enables update and delete operations on existing rows in Iceberg tables.
+            - Upsert mode
+                - Upsert mode allows for efficient updates of data in Iceberg v2 tables with identity fields defined.
