@@ -484,5 +484,22 @@
                 - Define data retention and disposal policies to manage the lifecycle of datafiles. Safely delete or archive files that are no longer needed to reduce risk exposure.
             - Continuous monitoring
                 - Implement continuous monitoring and alerting systems to detect and respond to security incidents in real time.        
+        
         - Security and governance via a semantic layer
+            - Understand your data
+                - Start by deeply understanding the data sources in your data lakehouse. Identify the types of data, data owners, and sensitivity levels. This understanding will inform your data governance and security decisions. Semantic layer platforms will enable you to label and tag your data to help make this classification more explicit.
+            - Define clear access control policies
+                - Develop a comprehensive access control policy that defines who can access what data and what actions they can perform. Use RBAC and attribute-based access control (ABAC) to ensure that only authorized users can access sensitive data.
+            - Implement data masking
+                - Data masking protects sensitive data. Implement masking rules to ensure that sensitive information is obfuscated when accessed by unauthorized users. Consider column-level masking for sensitive attributes such as personal identifiable information (PII).
+            - Maintain data lineage
+                - Keep track of the data flow within your semantic layer. Data lineage helps you understand how data is transformed and consumed, which is crucial for ensuring data quality and compliance.
+            - Document everything
+                - Maintain detailed documentation of your data governance and security policies, access controls, catalogs, and lineage. Documentation is essential for transparency, compliance, and troubleshooting.
+        
         - Security and governance at the catalog level
+            - Nessie
+                - Nessie primarily manages metadata, it offers a powerful authorization layer that controls access to this metadata. 
+                - It's important to note that Nessie doesn't directly store data but manages data location and metadata. Therefore, its authorization layer primarily focuses on controlling access to this metadata, ensuring that only authorized users or roles can interact with the metadata stored in Nessie.
+            - Tabular
+                - Tabular adopts an RBAC model, where access privileges are assigned to roles, and roles are subsequently assigned to individuals or other roles.
