@@ -467,3 +467,22 @@
                 - Support for row mutations enables update and delete operations on existing rows in Iceberg tables.
             - Upsert mode
                 - Upsert mode allows for efficient updates of data in Iceberg v2 tables with identity fields defined.
+
+## Governance and Security
+
+    - three critical angles for safeguarding your data lakehouse:
+        - Securing your datafiles
+            - Least privilege access
+                - Limit access to datafiles to only those individuals and processes that require it for their specific tasks. Grant the minimum level of permissions necessary to perform these tasks.
+            - Encryption at rest and in transit
+                - Enforce encryption of datafiles both at rest and in transit. Utilize the encryption mechanisms provided by your storage platform to safeguard data integrity and confidentiality.
+            - Strong authentication and identity management
+                - Implement robust identity and access management practices. Leverage multifactor authentication (MFA) and strong password policies to verify user identities.
+            - Audit trails and logging
+                - Enable auditing and logging features provided by your storage platform. Maintain comprehensive audit trails to monitor and investigate access to and changes to data files.
+            - Data retention and disposal policies
+                - Define data retention and disposal policies to manage the lifecycle of datafiles. Safely delete or archive files that are no longer needed to reduce risk exposure.
+            - Continuous monitoring
+                - Implement continuous monitoring and alerting systems to detect and respond to security incidents in real time.        
+        - Security and governance via a semantic layer
+        - Security and governance at the catalog level
