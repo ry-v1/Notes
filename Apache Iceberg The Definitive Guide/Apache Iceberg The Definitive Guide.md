@@ -503,3 +503,24 @@
                 - It's important to note that Nessie doesn't directly store data but manages data location and metadata. Therefore, its authorization layer primarily focuses on controlling access to this metadata, ensuring that only authorized users or roles can interact with the metadata stored in Nessie.
             - Tabular
                 - Tabular adopts an RBAC model, where access privileges are assigned to roles, and roles are subsequently assigned to individuals or other roles.
+
+## Migrating to Apache Iceberg
+
+    - Adapting data structures
+        - Before migrating data to Apache Iceberg, assess your existing data structures and adapt them to align with Iceberg's table format. This may involve restructuring data, renaming columns, or adjusting data types to fit Iceberg's requirements.
+        - Ensuring data compatibility is crucial for a successful migration. Apache Iceberg should be flexible enough for all kinds of data, but when it comes to complex types, Iceberg offers lists, structs, and maps. So, for something like JSON data, which may have its own field type in other platforms, you'll have to decide whether you want to convert the data into a map or save it as a string.
+    
+    - Adapting pipelines
+        - Update your data pipelines to support writing data to Iceberg tables. This may involve modifying your ETL processes and ensuring that data is correctly partitioned. 
+        - Fortunately, Apache Iceberg has many utilities to make moving things such as Hive, Delta Lake, and Hudi tables pretty straightforward.
+    
+    - Adapting workflows
+        - Review and adjust your data workflows to accommodate Iceberg. This includes considering how data dependencies, scheduling, and data access will change with the new data storage format. 
+        - For example, if you are denormalizing multiple datasets into an Apache Iceberg table, you'll want to check that tables are up to date and that any directed acyclic graphs (DAGs) make ingestion dependent on any work on the source tables so that they finish before the ingestion job begins.
+
+    - Three-Step In-Place Migration Plan
+        - Determine the number of files and records in the partition from the old table
+        - Migrate the partitions existing files into an existing Apache Iceberg table
+        - Determine the number of files and records in the same partition within the Iceberg table to make sure it matches
+
+        - Just repeat these steps until all the partitions have been added. Then you can move all read and write operations to the Apache Iceberg table
