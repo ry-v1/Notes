@@ -524,3 +524,13 @@
         - Determine the number of files and records in the same partition within the Iceberg table to make sure it matches
 
         - Just repeat these steps until all the partitions have been added. Then you can move all read and write operations to the Apache Iceberg table
+
+    - Four-Phase Shadow Migration Plan
+        - Phase 1: Write to the old system, read from the old system
+            - Initially, keep writing data to your existing system while setting up Iceberg tables. This phase allows you to establish Iceberg infrastructure without affecting ongoing operations. However, you won't benefit from Iceberg's features yet. You should also make sure to write all historical data from the old table to the new Iceberg table before you begin writing new data to Iceberg in Phase 2.
+        - Phase 2: Write to the old and new systems, read from the old system
+            - In this phase, duplicate data is written to both the old and new systems. This redundancy ensures data consistency but increases storage costs.
+        - Phase 3: Write to the old and new systems, read from the new system
+            - Once you are confident in the new Iceberg setup, switch your read operations to use the new Iceberg tables. Ensure that data consistency is maintained between both systems during this transition.
+        - Phase 4: Write to the new system, read from the new system
+            - Gradually phase out the old system and start writing data exclusively to the new Iceberg tables. Monitor the transition carefully to catch any potential issues.
