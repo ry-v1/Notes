@@ -82,4 +82,14 @@ This file has notes from the book "100 SQL Server Mistakes and How to Avoid Them
   - Remember to take advantage of DOP query feedback.
   - DOP feedback is disabled by default, unlike other query feedback mechanisms.
   - Consider partitioning large tables to improve performance and reduce load on the I/O subsystem.
-  - Partitioning tables allows for partition elimination, meaning that partitions are not read if they do not store relevant data.  
+  - Partitioning tables allows for partition elimination, meaning that partitions are not read if they do not store relevant data.
+  - Consider using data compression as a performance enhancement for large tables.
+  - Data compression is best suited to workloads that are I/O bound and have spare processor capacity.
+  - The compression rate achieved will be dependent on the data stored within the table. Use the sp_estimate_data_compression_savings stored procedure to evaluate the impact of row compression and page compression before implementing either option.
+  - Avoid the Read Uncommitted transaction isolation level unless you are working with tables stored in read-only filegroups.
+  - The Read Uncommitted isolation level can result in dirty reads just as the use of the NOLOCK query hint can.
+  - Avoid using strong isolation levels such as Repeatable Read or Serializable unless they are absolutely required, as they can lead to lock contention and deadlocks.
+  - Consider using optimistic isolation levels in situations when you face performance issues caused by lock contention.
+  - The optimistic isolation levels are Read Committed Snapshot and Snapshot.
+  - Optimistic isolation levels are best suited to environments where TempDB is not I/O bound and there is plenty of free space on the TempDB volume.
+  - Avoid throwing extra hardware at performance issues. Try to diagnose the root cause of the issue and resolve it instead.
