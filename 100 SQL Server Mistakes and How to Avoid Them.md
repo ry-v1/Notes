@@ -93,3 +93,27 @@ This file has notes from the book "100 SQL Server Mistakes and How to Avoid Them
   - The optimistic isolation levels are Read Committed Snapshot and Snapshot.
   - Optimistic isolation levels are best suited to environments where TempDB is not I/O bound and there is plenty of free space on the TempDB volume.
   - Avoid throwing extra hardware at performance issues. Try to diagnose the root cause of the issue and resolve it instead.
+
+**Indexes**
+  - If we create a table with no clustered index, this is known as a heap. In a heap, data is stored in no particular order. 
+  - Instead of an index root, there is a simple Index Allocation Map that stores a list of all pages allocated to the heap. 
+  - For larger tables, this means that SQL Server has to work hard to find any given value. 
+  - Specifically, almost any query SELECT statement issued against a heap will require SQL Server to read every single data page that makes up the table. 
+  - Queries that include keywords such as TOP may not require a read of all pages in the table.
+
+  - If we create a clustered index on a table, then SQL Server builds a B-tree structure. 
+  - This operation orders the pages in a table using the clustered key. 
+  - The clustered key is usually built on the primary key of the table. 
+  - If you have a wide primary key, however, it is possible to build it on a different, unique column.
+  - A clustered index allows for read operations to be performed more efficiently. 
+  - The leaf level of the B-tree structure is the actual data pages of the table. 
+  - This means that the data pages of the table are stored in the order of the clustered key. For this reason, we can only have a single clustered index on a table.
+
+  - A nonclustered index is a B-tree structure built on a different column(s) within the table. 
+  - SQL Server can use these indexes to improve the performance of operations such as joins, filters, and aggregations. 
+  - The leaf level of a nonclustered index contains pointers to the data pages of the heap or clustered index. 
+  - Because it does not impact the order of the actual data pages, we can have multiple nonclustered indexes on a table. 
+  - In fact, a table can support up to 256 nonclustered indexes, although having too many can have a negative impact on write operations and also consumes space on disk, and potentially in memory.
+
+  - External fragmentation refers to index pages becoming out of physical order. 
+  - Internal fragmentation describes the amount of free space on index pages.
