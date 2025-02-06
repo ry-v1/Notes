@@ -108,6 +108,8 @@ This file has notes from the book "100 SQL Server Mistakes and How to Avoid Them
   - A clustered index allows for read operations to be performed more efficiently. 
   - The leaf level of the B-tree structure is the actual data pages of the table. 
   - This means that the data pages of the table are stored in the order of the clustered key. For this reason, we can only have a single clustered index on a table.
+  - A B-tree structure is the structure that indexes are organized into. They have a root level consisting of a single page, zero or more intermediate levels, and a singl leaf level.
+  - The leaf level of a clustered index is the actual data pages of the table whereas the leaf level of a nonclustered index contains pointers to the data pages of the table.
 
   - A nonclustered index is a B-tree structure built on a different column(s) within the table. 
   - SQL Server can use these indexes to improve the performance of operations such as joins, filters, and aggregations. 
@@ -115,5 +117,15 @@ This file has notes from the book "100 SQL Server Mistakes and How to Avoid Them
   - Because it does not impact the order of the actual data pages, we can have multiple nonclustered indexes on a table. 
   - In fact, a table can support up to 256 nonclustered indexes, although having too many can have a negative impact on write operations and also consumes space on disk, and potentially in memory.
 
-  - External fragmentation refers to index pages becoming out of physical order. 
+
   - Internal fragmentation describes the amount of free space on index pages.
+  - Internal fragmentation refers to a low page density, which causes more pages than necessary to be read.
+  - Low page density needs to be traded off against the risk of page splits caused by updates to very dense pages.
+
+  - External fragmentation refers to index pages becoming out of physical order. 
+  - External fragmentation refers to pages being out of order, which can damage performance.
+  - External fragmentation only causes a performance issue for index scans. Index seeks are not impacted.
+
+
+  - Good page splits occur when pages are allocated at the end of an index.
+  - Bad page splits occur when pages are allocated in the middle of the index and data needs to be moved to the new page. These page splits cause increased I/O and performance penalties.
