@@ -117,7 +117,6 @@ This file has notes from the book "100 SQL Server Mistakes and How to Avoid Them
   - Because it does not impact the order of the actual data pages, we can have multiple nonclustered indexes on a table. 
   - In fact, a table can support up to 256 nonclustered indexes, although having too many can have a negative impact on write operations and also consumes space on disk, and potentially in memory.
 
-
   - Internal fragmentation describes the amount of free space on index pages.
   - Internal fragmentation refers to a low page density, which causes more pages than necessary to be read.
   - Low page density needs to be traded off against the risk of page splits caused by updates to very dense pages.
@@ -126,6 +125,23 @@ This file has notes from the book "100 SQL Server Mistakes and How to Avoid Them
   - External fragmentation refers to pages being out of order, which can damage performance.
   - External fragmentation only causes a performance issue for index scans. Index seeks are not impacted.
 
-
   - Good page splits occur when pages are allocated at the end of an index.
   - Bad page splits occur when pages are allocated in the middle of the index and data needs to be moved to the new page. These page splits cause increased I/O and performance penalties.
+
+  - An index seek starts at the root level of the B-tree and traverses all levels until it finds the required row.
+  - An index scan reads the leaf level of an index until it reaches the end of the data it is searching for.
+  - An index loop uses a nonclustered index to perform a filter or aggregation and then looks up further data from the clustered index or heap.
+  - Seek, scan, and lookup ratios can be determined by using the sys.dm_db_index_usage_stats dynamic management view (DMV).
+  - Do not reorganize indexes to fix page density. Reorganizing indexes only fills pages up to the level of FILLFACTOR. It does not reduce density to the level of FILLFACTOR. We should rebuild indexes instead.
+  - Avoid aggregating fragmentation statistics from sys.dm_db_index_physical_stats. Instead, focus on the leaf-level data.
+  - Not rebuilding indexes will have an impact on index scans and therefore query performance. If a database is 24/7, use online index rebuilds.
+  - Do not rebuild all indexes indiscriminately. Only rebuild indexes that require it based on fragmentation statistics.
+  - Do not update statistics after rebuilding indexes, as this can result in worse statistics.
+  - In the majority of cases, automatically updating statistics is good enough.
+  - If you decide to update statistics, consider the tradeoff against plan recompilation.
+  - Depending on the query performance tradeoff against a maintenance window, consider MAXDOP for index rebuilds.
+  - If you are suffering from last page insert contention, consider using OPTIMIZE_FOR_SEQUENTIAL_KEY.
+  - If you need to perform bulk load operations, consider disabling nonclustered indexes on the target table to improve write performance.
+  - Do not rely too heavily on tools such as Database Engine Tuning Advisor. You can use them as a guide, but you must layer them with your own business knowledge.
+  - Columnstore indexes organize pages around columns instead of rows.
+  - Consider using columnstore indexes on large fact tables to improve the performance of analytical queries.
