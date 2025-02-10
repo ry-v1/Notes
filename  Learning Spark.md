@@ -38,3 +38,12 @@
     - Phase 3: Physical planning : In this phase, Spark SQL generates an optimal physical plan for the selected logical plan, using physical operators that match those available in the Spark execution engine.
     - Phase 4: Code generation :  The final phase of query optimization involves generating efficient Java bytecode to run on each machine. Because Spark SQL can operate on data sets loaded in memory, Spark can use state-of-the-art compiler technology for code generation to speed up execution. In other words, it acts as a compiler. Project Tungsten, which facilitates whole-stage code generation, plays a role here.
     - what is whole-stage code generation? It's a physical query optimization phase that collapses the whole query into a single function, getting rid of virtual function calls and employing CPU registers for intermediate data. The second-generation Tungsten engine, introduced in Spark 2.0, uses this approach to generate compact RDD code for final execution. This streamlined strategy significantly improves CPU efficiency and performance.
+
+- Managed Versus UnmanagedTables
+    - Spark allows you to create two types of tables: managed and unmanaged. 
+    - For a managed table, Spark manages both the metadata and the data in the file store. This could be a local filesystem, HDFS, or an object store such as Amazon S3 or Azure Blob. 
+    - For an unmanaged table, Spark only manages the metadata, while you manage the data yourself in an external data source such as Cassandra.
+
+- Temporary views versus global temporary views
+    - A temporary view is tied to a single SparkSession within a Spark application. 
+    - A global temporary view is visible across multiple SparkSessions within a Spark application.
