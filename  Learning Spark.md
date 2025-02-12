@@ -47,3 +47,42 @@
 - Temporary views versus global temporary views
     - A temporary view is tied to a single SparkSession within a Spark application. 
     - A global temporary view is visible across multiple SparkSessions within a Spark application.
+
+#### Optimizing and Tuning Spark for Efficiency
+
+- Viewing and Setting Apache Spark Configurations
+    - In $SPARK_HOME directory (where you installed Spark), there are a number of config files: conf/spark-defaults.conf.template, conf/log4j.properties.template, and conf/spark-env.sh.template. Changing the default values in these files and saving them without the .template suffix instructs Spark to use these new values.
+    - Set Spark configurations directly in your Spark application or on the command line when submitting the application with spark-submit, using the --conf flag
+    - The third option is through a programmatic interface via the Spark shell.
+
+- Static versus dynamic resource allocation
+    - When you specify compute resources as command-line arguments to spark-submit, you cap the limit. This means that if more resources are needed later as tasks queue up in the driver due to a larger than anticipated workload, Spark cannot accommodate or allocate extra resources.
+    - If instead you use Spark’s dynamic resource allocation configuration, the Spark driver can request more or fewer compute resources as the demand of large workloads flows and ebbs. In scenarios where your workloads are dynamic—that is, they vary in their demand for compute capacity—using dynamic allocation helps to accommodate sudden peaks.
+
+- Configuring Spark executors’ memory and the shuffle service
+    - The amount of memory available to each executor is controlled by spark.executor.memory. 
+    - This is divided into three sections, as depicted in execution memory, storage memory, and reserved memory. 
+    - The default division is 60% for execution memory and 40% for storage, after allowing for 300 MB for reserved memory, to safeguard against OOM errors.
+    - When storage memory is not being used, Spark can acquire it for use in execution memory for execution purposes, and vice versa.
+    - Execution memory is used for Spark shuffles, joins, sorts, and aggregations. Since different queries may require different amounts of memory, the fraction (spark.memory.fraction is 0.6 by default) of the available memory to dedicate to this can be tricky to tune but it’s easy to adjust. 
+    - By contrast, storage memory is primarily used for caching user data structures and partitions derived from DataFrames.
+    - During map and shuffle operations, Spark writes to and reads from the local disk’s shuffle files, so there is heavy I/O activity. This can result in a bottleneck, because the default configurations are suboptimal for large-scale Spark jobs.
+
+- Spark configurations to tweak for I/O during map and shuffle operations
+    Configuration | Default value, recommendation, and description
+    spark.driver.memory | Default is 1g (1 GB). This is the amount of memory allocated to the Spark driver to receive data from executors. This is often changed during     | spark-submit with --driver-memory. Only change this if you expect the driver to receive large amounts of data back from operations like collect(), or if you run out of driver memory.
+    spark.shuffle.file.buffer | Default is 32 KB. Recommended is 1 MB. This allows Spark to do more buffering before writing final map results to disk.
+    spark.file.transferTo | Default is true. Setting it to false will force Spark to use the file buffer to transfer files before finally writing to disk; this will decrease the I/O activity.
+    spark.shuffle.unsafe.file.output.buffer | Default is 32 KB. This controls the amount of buffering possible when merging files during shuffle operations. In general, large values (e.g., 1 MB) are more appropriate for larger workloads, whereas the default can work for smaller workloads.
+    spark.io.compression.lz4.blockSize | Default is 32 KB. Increase to 512 KB. You can decrease the size of the shuffle file by increasing the compressed size of the block.
+    spark.shuffle.service.index.cache.size | Default is 100m. Cache entries are limited to the specified memory footprint in byte.
+    spark.shuffle.registration.timeout | Default is 5000 ms. Increase to 120000 ms.
+    spark.shuffle.registration.maxAttempts | Default is 3. Increase to 5 if needed.
+
+- Spark will at best schedule a thread per task per core, and each task will process a distinct partition. To optimize resource utilization and maximize parallelism, the ideal is at least as many partitions as there are cores on the executor.
+
+- If there are more partitions than there are cores on each executor, all the cores are kept busy. You can think of partitions as atomic units of parallelism: a single thread running on a single core can work on a single partition.
+
+- How partitions are created?
+    - Spark’s tasks process data as partitions read from disk into memory. Data on disk is laid out in chunks or contiguous file blocks, depending on the store. By default, file blocks on data stores range in size from 64 MB to 128 MB. For example, on HDFS and S3 the default size is 128 MB (this is configurable). A contiguous collection of these blocks constitutes a partition.
+    - The size of a partition in Spark is dictated by spark.sql.files.maxPartitionBytes. The default is 128 MB. You can decrease the size, but that may result in what’s known as the “small file problem”—many small partition files, introducing an inordinate amount of disk I/O and performance degradation thanks to filesystem operations such as opening, closing, and listing directories, which on a distributed filesystem can be slow.
