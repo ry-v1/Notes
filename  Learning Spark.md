@@ -66,9 +66,10 @@
     - When storage memory is not being used, Spark can acquire it for use in execution memory for execution purposes, and vice versa.
     - Execution memory is used for Spark shuffles, joins, sorts, and aggregations. Since different queries may require different amounts of memory, the fraction (spark.memory.fraction is 0.6 by default) of the available memory to dedicate to this can be tricky to tune but it’s easy to adjust. 
     - By contrast, storage memory is primarily used for caching user data structures and partitions derived from DataFrames.
-    - During map and shuffle operations, Spark writes to and reads from the local disk’s shuffle files, so there is heavy I/O activity. This can result in a bottleneck, because the default configurations are suboptimal for large-scale Spark jobs.
+    - During map and shuffle operations, Spark writes to and reads from the local disk's shuffle files, so there is heavy I/O activity. This can result in a bottleneck, because the default configurations are suboptimal for large-scale Spark jobs.
 
 - Spark configurations to tweak for I/O during map and shuffle operations
+    
     Configuration | Default value, recommendation, and description
     spark.driver.memory | Default is 1g (1 GB). This is the amount of memory allocated to the Spark driver to receive data from executors. This is often changed during     | spark-submit with --driver-memory. Only change this if you expect the driver to receive large amounts of data back from operations like collect(), or if you run out of driver memory.
     spark.shuffle.file.buffer | Default is 32 KB. Recommended is 1 MB. This allows Spark to do more buffering before writing final map results to disk.
@@ -84,5 +85,20 @@
 - If there are more partitions than there are cores on each executor, all the cores are kept busy. You can think of partitions as atomic units of parallelism: a single thread running on a single core can work on a single partition.
 
 - How partitions are created?
-    - Spark’s tasks process data as partitions read from disk into memory. Data on disk is laid out in chunks or contiguous file blocks, depending on the store. By default, file blocks on data stores range in size from 64 MB to 128 MB. For example, on HDFS and S3 the default size is 128 MB (this is configurable). A contiguous collection of these blocks constitutes a partition.
-    - The size of a partition in Spark is dictated by spark.sql.files.maxPartitionBytes. The default is 128 MB. You can decrease the size, but that may result in what’s known as the “small file problem”—many small partition files, introducing an inordinate amount of disk I/O and performance degradation thanks to filesystem operations such as opening, closing, and listing directories, which on a distributed filesystem can be slow.
+    - Spark's tasks process data as partitions read from disk into memory. Data on disk is laid out in chunks or contiguous file blocks, depending on the store. By default, file blocks on data stores range in size from 64 MB to 128 MB. For example, on HDFS and S3 the default size is 128 MB (this is configurable). A contiguous collection of these blocks constitutes a partition.
+    - The size of a partition in Spark is dictated by spark.sql.files.maxPartitionBytes. The default is 128 MB. You can decrease the size, but that may result in what's known as the “small file problem”—many small partition files, introducing an inordinate amount of disk I/O and performance degradation thanks to filesystem operations such as opening, closing, and listing directories, which on a distributed filesystem can be slow.
+
+- Caching and Persistence of Data
+    - cache() will store as many of the partitions read in memory across Spark executors as memory allows
+    - persist(StorageLevel.LEVEL) is nuanced, providing control over how your data is cached via StorageLevel.
+    - When you use cache() or persist(), the DataFrame is not fully cached until you invoke an action that goes through every record(e.g., count()). 
+    - If you use an action like take(1), only one partition will be cached because Catalyst realizes that you do not need to compute all the partitions just to retrieve one record.
+
+- When to Cache and Persist
+    - Common use cases for caching are scenarios where you will want to access a large data set repeatedly for queries or transformations. Some examples include:
+        - DataFrames commonly used during iterative machine learning training
+        - DataFrames accessed commonly for doing frequent transformations during ETL or building data pipelines
+- When Not to Cache and Persist
+    - Not all use cases dictate the need to cache. Some scenarios that may not warrant caching your DataFrames include:
+        - DataFrames that are too big to fit in memory
+        - An inexpensive transformation on a DataFrame not requiring frequent use, regardless of size
