@@ -57,9 +57,9 @@
 
 - Static versus dynamic resource allocation
     - When you specify compute resources as command-line arguments to spark-submit, you cap the limit. This means that if more resources are needed later as tasks queue up in the driver due to a larger than anticipated workload, Spark cannot accommodate or allocate extra resources.
-    - If instead you use Spark’s dynamic resource allocation configuration, the Spark driver can request more or fewer compute resources as the demand of large workloads flows and ebbs. In scenarios where your workloads are dynamic—that is, they vary in their demand for compute capacity—using dynamic allocation helps to accommodate sudden peaks.
+    - If instead you use Spark's dynamic resource allocation configuration, the Spark driver can request more or fewer compute resources as the demand of large workloads flows and ebbs. In scenarios where your workloads are dynamic—that is, they vary in their demand for compute capacity—using dynamic allocation helps to accommodate sudden peaks.
 
-- Configuring Spark executors’ memory and the shuffle service
+- Configuring Spark executors memory and the shuffle service
     - The amount of memory available to each executor is controlled by spark.executor.memory. 
     - This is divided into three sections, as depicted in execution memory, storage memory, and reserved memory. 
     - The default division is 60% for execution memory and 40% for storage, after allowing for 300 MB for reserved memory, to safeguard against OOM errors.
@@ -98,7 +98,30 @@
     - Common use cases for caching are scenarios where you will want to access a large data set repeatedly for queries or transformations. Some examples include:
         - DataFrames commonly used during iterative machine learning training
         - DataFrames accessed commonly for doing frequent transformations during ETL or building data pipelines
+
 - When Not to Cache and Persist
     - Not all use cases dictate the need to cache. Some scenarios that may not warrant caching your DataFrames include:
         - DataFrames that are too big to fit in memory
         - An inexpensive transformation on a DataFrame not requiring frequent use, regardless of size
+
+- Spark join strategies : by which it exchanges, moves, sorts, groups, and merges data across executors
+
+    - Broadcast Hash Join : Also known as a map-side-only join
+        - The broadcast hash join is employed when two data sets, one small (fitting in the driver's and executor's memory) and another large enough to ideally be spared from movement, need to be joined over certain conditions or columns. 
+        - Using a Spark broadcast variable, the smaller data set is broadcasted by the driver to all Spark executors, and subsequently joined with the larger data set on each executor. 
+        - This strategy avoids the large exchange.
+        - By default Spark will use a broadcast join if the smaller data set is less than 10 MB.
+        - This configuration is set in spark.sql.autoBroadcastJoinThreshold. Specifying a value of -1 in spark.sql.autoBroadcastJoinThreshold will cause Spark to always resort to a shuffle sort merge join
+    - When to use a broadcast hash join : Use this type of join under the following conditions for maximum benefit:
+        - When each key within the smaller and larger data sets is hashed to the same partition by Spark
+        - When one data set is much smaller than the other (and within the default config of 10 MB, or more if you have sufficient memory)
+        - When you only want to perform an equi-join, to combine two data sets based on matching unsorted keys
+        - When you are not worried by excessive network bandwidth usage or OOM errors, because the smaller data set will be broadcast to all Spark executors
+    
+    - Shuffle Sort Merge Join
+        - As the name indicates, this join scheme has two phases: a sort phase followed by a merge phase. 
+        - The sort phase sorts each data set by its desired join key; the merge phase iterates over each key in the row from each data set and merges the rows if the two keys match.
+        - By default, the SortMergeJoin is enabled via spark.sql.join.preferSortMergeJoin.
+    - Optimizing the shuffle sort merge join
+        - We can eliminate the Exchange step from this scheme if we create partitioned buckets for common sorted keys or columns on which we want to perform frequent equi-joins. 
+        - We can create an explicit number of buckets to store specific sorted columns (one key per bucket). Presorting and reorganizing data in this way boosts performance, as it allows us to skip the expensive Exchange operation and go straight to WholeStageCodegen.
