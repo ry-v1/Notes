@@ -146,3 +146,39 @@
         - If shuffle data is being read from remote executors, a high Shuffle Read Blocked Time can signal I/O issues. 
         - A high GC time signals too many objects on the heap (your executors may be memory-starved). 
         - If a stage's max task time is much larger than the median, then you probably have data skew caused by uneven data distribution in your partitions.
+    - Executors
+        - The Executors tab provides information on the executors created for the application.
+        - We can drill down into the minutiae of details about resource usage (disk, memory, cores), time spent in GC, amount of data written and read during shuffle, etc.
+        - In addition to the summary statistics, you can view how memory is used by each individual executor, and for what purpose. 
+        - This also helps to examine resource usage when you have used the cache() or persist() method on a DataFrame or managed table.
+    - Storage
+        - The Storage tab, provides information on any tables or DataFrames cached by the application as a result of the cache() or persist() method.
+    - SQL
+        - The effects of Spark SQL queries that are executed as part of your Spark application are traceable and viewable through the SQL tab. 
+        - You can see when the queries were executed and by which jobs, and their duration.
+        - Clicking on the description of a query displays details of the execution plan with all the physical operators.
+        - Under each physical operator of the plan—here, Scan In-memory table, HashAggregate, and Exchange—are SQL metrics.
+        - These metrics are useful when we want to inspect the details of a physical operator and discover what transpired: how many rows were scanned, how many shuffle bytes were written, etc.
+    - Environment
+        - what environment variables are set, what jars are included, what Spark properties are set (and their respective values), what system properties are set, what runtime environment (such as JVM or Java version) is used
+
+#### Structured Streaming
+    - Five Steps to Define a Streaming Query
+        - Step 1: Define input sources - spark.readStream to create a DataStreamReader
+        - Step 2: Transform data
+            - Stateless transformations : Operations like select(), filter(), map(), etc. do not require any information from previous rows to process the next row; each row can be processed by itself. The lack of previous “state” in these operations make them stateless. Stateless operations can be applied to both batch and streaming DataFrames.
+            - Stateful transformations : In contrast, an aggregation operation like count() requires maintaining state to combine data across multiple rows. More specifically, any DataFrame operations involving grouping, joining, or aggregating are stateful transformations. While many of these operations are supported in Structured Streaming, a few combinations of them are not supported because it is either computationally hard or infeasible to compute them in an incremental manner.
+        - Step 3: Define output sink and output mode - define how to write the processed output data with DataFrame.writeStream
+        - Step 4: Specify processing details
+            - Triggering details This indicates when to trigger the discovery and processing of newly available streaming data. There are four options:
+                - Default
+                    - When the trigger is not explicitly specified, then by default, the streaming query executes data in micro-batches where the next micro-batch is triggered as soon as the previous micro-batch has completed.
+                - Processing time with trigger interval
+                    - You can explicitly specify the ProcessingTime trigger with an interval, and the query will trigger micro-batches at that fixed interval.
+                - Once
+                    - In this mode, the streaming query will execute exactly one micro-batch—it processes all the new data available in a single batch and then stops itself. This is useful when you want to control the triggering and processing from an external scheduler that will restart the query using any custom schedule (e.g., to control cost by only executing a query once per day).
+                - Continuous
+                    - This is an experimental mode (as of Spark 3.0) where the streaming query will process data continuously instead of in micro-batches. While only a small subset of DataFrame operations allow this mode to be used, it can provide much lower latency (as low as milliseconds) than the micro-batch trigger modes.
+                - Checkpoint location
+                    - This is a directory in any HDFS-compatible filesystem where a streaming query saves its progress information—that is, what data has been successfully processed. Upon failure, this metadata is used to restart the failed query exactly where it left off. Therefore, setting this option is necessary for failure recovery with exactly-once guarantees.
+        - Step 5: Start the query 
