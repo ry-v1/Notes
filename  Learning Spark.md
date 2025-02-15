@@ -70,15 +70,16 @@
 
 - Spark configurations to tweak for I/O during map and shuffle operations
     
-    Configuration | Default value, recommendation, and description
-    spark.driver.memory | Default is 1g (1 GB). This is the amount of memory allocated to the Spark driver to receive data from executors. This is often changed during     | spark-submit with --driver-memory. Only change this if you expect the driver to receive large amounts of data back from operations like collect(), or if you run out of driver memory.
-    spark.shuffle.file.buffer | Default is 32 KB. Recommended is 1 MB. This allows Spark to do more buffering before writing final map results to disk.
-    spark.file.transferTo | Default is true. Setting it to false will force Spark to use the file buffer to transfer files before finally writing to disk; this will decrease the I/O activity.
-    spark.shuffle.unsafe.file.output.buffer | Default is 32 KB. This controls the amount of buffering possible when merging files during shuffle operations. In general, large values (e.g., 1 MB) are more appropriate for larger workloads, whereas the default can work for smaller workloads.
-    spark.io.compression.lz4.blockSize | Default is 32 KB. Increase to 512 KB. You can decrease the size of the shuffle file by increasing the compressed size of the block.
-    spark.shuffle.service.index.cache.size | Default is 100m. Cache entries are limited to the specified memory footprint in byte.
-    spark.shuffle.registration.timeout | Default is 5000 ms. Increase to 120000 ms.
-    spark.shuffle.registration.maxAttempts | Default is 3. Increase to 5 if needed.
+    | Configuration | Default value, recommendation, and description     | 
+    | ------------- | -------------------------------------------------- | 
+    | spark.driver.memory | Default is 1g (1 GB). This is the amount of memory allocated to the Spark driver to receive data from executors. This is often changed during spark-submit with --driver-memory. Only change this if you expect the driver to receive large amounts of data back from operations like collect(), or if you run out of driver memory.    | 
+    | spark.shuffle.file.buffer | Default is 32 KB. Recommended is 1 MB. This allows Spark to do more buffering before writing final map results to disk.    | 
+    | spark.file.transferTo | Default is true. Setting it to false will force Spark to use the file buffer to transfer files before finally writing to disk; this will decrease the I/O activity.    | 
+    | spark.shuffle.unsafe.file.output.buffer | Default is 32 KB. This controls the amount of buffering possible when merging files during shuffle operations. In general, large values (e.g., 1 MB) are more appropriate for larger workloads, whereas the default can work for smaller workloads.    | 
+    | spark.io.compression.lz4.blockSize | Default is 32 KB. Increase to 512 KB. You can decrease the size of the shuffle file by increasing the compressed size of the block.    | 
+    | spark.shuffle.service.index.cache.size | Default is 100m. Cache entries are limited to the specified memory footprint in byte.    | 
+    | spark.shuffle.registration.timeout | Default is 5000 ms. Increase to 120000 ms.    | 
+    | spark.shuffle.registration.maxAttempts | Default is 3. Increase to 5 if needed.    | 
 
 - Spark will at best schedule a thread per task per core, and each task will process a distinct partition. To optimize resource utilization and maximize parallelism, the ideal is at least as many partitions as there are cores on the executor.
 
@@ -125,3 +126,23 @@
     - Optimizing the shuffle sort merge join
         - We can eliminate the Exchange step from this scheme if we create partitioned buckets for common sorted keys or columns on which we want to perform frequent equi-joins. 
         - We can create an explicit number of buckets to store specific sorted columns (one key per bucket). Presorting and reorganizing data in this way boosts performance, as it allows us to skip the expensive Exchange operation and go straight to WholeStageCodegen.
+    - When to use a shuffle sort merge join : Use this type of join under the following conditions for maximum benefit:
+        - When each key within two large data sets can be sorted and hashed to the same partition by Spark
+        - When you want to perform only equi-joins to combine two data sets based on matching sorted keys
+        - When you want to prevent Exchange and Sort operations to save large shuffles across the network
+
+- Inspecting the Spark UI
+    - Jobs and Stages tabs allow you to navigate through these and drill down to a granular level to examine the details of individual tasks. 
+
+    - Jobs tab 
+        - You can view their completion status and review metrics related to I/O, memory consumption, duration of execution, etc.
+        - Jobs tab with the expanded Event Timeline, showing when executors were added to or removed from the cluster. It also provides a tabular list of all completed jobs in the cluster. 
+        - The Duration column indicates the time it took for each job (identified by the Job Id in the first column) to finish. If this time is high, it's a good indication that you might want to investigate the stages in that job to see what tasks might be causing delays. 
+        - From the summary page you can also access a details page for each job, including a DAG visualization and list of completed stages.
+    - Stages tab
+        - The Stages tab provides a summary of the current state of all stages of all jobs in the application. 
+        - You can also access a details page for each stage, providing a DAG and metrics on its tasks.
+        - You can see the average duration of each task, time spent in garbage collection (GC), and number of shuffle bytes/records read. 
+        - If shuffle data is being read from remote executors, a high Shuffle Read Blocked Time can signal I/O issues. 
+        - A high GC time signals too many objects on the heap (your executors may be memory-starved). 
+        - If a stage's max task time is much larger than the median, then you probably have data skew caused by uneven data distribution in your partitions.
