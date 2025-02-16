@@ -182,3 +182,15 @@
                 - Checkpoint location
                     - This is a directory in any HDFS-compatible filesystem where a streaming query saves its progress information—that is, what data has been successfully processed. Upon failure, this metadata is used to restart the failed query exactly where it left off. Therefore, setting this option is necessary for failure recovery with exactly-once guarantees.
         - Step 5: Start the query 
+
+- Under the Hood of an Active Streaming Query
+    - Once the query starts, the following sequence of steps transpires in the engine. The DataFrame operations are converted into a logical plan, which is an abstract representation of the computation that Spark SQL uses to plan a query:
+    1. Spark SQL analyzes and optimizes this logical plan to ensure that it can be executed incrementally and efficiently on streaming data.
+    2. Spark SQL starts a background thread that continuously executes the following loopThis execution loop runs for micro-batch-based trigger modes (i.e., ProcessingTime and Once), but not for the Continuous trigger mode.
+        a. Based on the configured trigger interval, the thread checks the streaming sources for the availability of new data.
+        b. If available, the new data is executed by running a micro-batch. From the optimized logical plan, an optimized Spark execution plan is generated that reads the new data from the source, incrementally computes the updated result, and writes the output to the sink according to the configured output mode.
+        c. For every micro-batch, the exact range of data processed (e.g., the set of files or the range of Apache Kafka offsets) and any associated state are saved in the configured checkpoint location so that the query can deterministically reprocess the exact range if needed.
+    3. This loop continues until the query is terminated, which can occur for one of the following reasons:
+        a. A failure has occurred in the query (either a processing error or a failure in the cluster).
+        b. The query is explicitly stopped using streamingQuery.stop().
+        c. If the trigger is set to Once, then the query will stop on its own after executing a single micro-batch containing all the available data.
