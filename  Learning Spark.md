@@ -221,3 +221,23 @@
     - Two Spark SQL configurations dictate how AQE will reduce the number of reducers:
         • spark.sql.adaptive.coalescePartitions.enabled (set to true)
         • spark.sql.adaptive.skewJoin.enabled (set to true)
+
+- SQL Join Hints
+    - Shuffle sort merge join (SMJ)
+        - With these new hints, you can suggest to Spark that it perform a SortMergeJoin when joining tables a and b or customers and orders, as shown in the following examples. You can add one or more hints to a SELECT statement inside /*+ ... */ comment blocks:
+            SELECT /*+ MERGE(a, b) */ id FROM a JOIN b ON a.key = b.key
+            SELECT /*+ MERGE(customers, orders) */ * FROM customers, orders WHERE
+            orders.custId = customers.custId
+        - Broadcast hash join (BHJ)
+            - Similarly, for a broadcast hash join, you can provide a hint to Spark that you prefer a broadcast join. For example, here we broadcast table a to join with table b and table customers to join with table orders:
+                SELECT /*+ BROADCAST(a) */ id FROM a JOIN b ON a.key = b.key
+                SELECT /*+ BROADCAST(customers) */ * FROM customers, orders WHERE
+                orders.custId = customers.custId
+        - Shuffle hash join (SHJ)
+            You can offer hints in a similar way to perform shuffle hash joins, though this is less commonly encountered than the previous two supported join strategies:
+            SELECT /*+ SHUFFLE_HASH(a, b) */ id FROM a JOIN b ON a.key = b.key
+            SELECT /*+ SHUFFLE_HASH(customers, orders) */ * FROM customers, orders WHERE
+            orders.custId = customers.custId
+        - Shuffle-and-replicate nested loop join (SNLJ)
+            Finally, the shuffle-and-replicate nested loop join adheres to a similar form and syntax:
+            SELECT /*+ SHUFFLE_REPLICATE_NL(a, b) */ id FROM a JOIN b
