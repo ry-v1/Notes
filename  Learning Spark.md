@@ -9,15 +9,15 @@
 
 - A Spark application consists of a driver program that is responsible for orchestrating parallel operations on the Spark cluster. The driver accesses the distributed components in the cluster—the Spark executors and cluster manager—through a SparkSession.
 
-- Spark driver : it communicates with the cluster manager; it requests resources (CPU, memory, etc.) from the cluster manager for Spark’s executors (JVMs); and it transforms all the Spark operations into DAG computations, schedules them, and distributes their execution as tasks across the Spark executors. Once the resources are allocated, it communicates directly with the executors.
+- Spark driver : it communicates with the cluster manager; it requests resources (CPU, memory, etc.) from the cluster manager for Spark's executors (JVMs); and it transforms all the Spark operations into DAG computations, schedules them, and distributes their execution as tasks across the Spark executors. Once the resources are allocated, it communicates directly with the executors.
 
-- SparkSession : Through this one conduit, you can create JVM runtime parameters, define DataFrames and Datasets, read from data sources, access catalog metadata, and issue Spark SQL queries. SparkSession provides a single unified entry point to all of Spark’s functionality.
+- SparkSession : Through this one conduit, you can create JVM runtime parameters, define DataFrames and Datasets, read from data sources, access catalog metadata, and issue Spark SQL queries. SparkSession provides a single unified entry point to all of Spark's functionality.
 
 - Cluster manager : The cluster manager is responsible for managing and allocating resources for the cluster of nodes on which your Spark application runs. Currently, Spark supports four cluster managers: the built-in standalone cluster manager, Apache Hadoop YARN, Apache Mesos, and Kubernetes.
 
 - Spark executor : A Spark executor runs on each worker node in the cluster. The executors communicate with the driver program and are responsible for executing tasks on the workers. In most deployments modes, only a single executor runs per node.
 
-- Deployment modes : An attractive feature of Spark is its support for myriad deployment modes, enabling Spark to run in different configurations and environments. Because the cluster manager is agnostic to where it runs (as long as it can manage Spark’s executors and fulfill resource requests), Spark can be deployed in some of the most popular environments—such as Apache Hadoop YARN and Kubernetes—and can operate in different modes.
+- Deployment modes : An attractive feature of Spark is its support for myriad deployment modes, enabling Spark to run in different configurations and environments. Because the cluster manager is agnostic to where it runs (as long as it can manage Spark's executors and fulfill resource requests), Spark can be deployed in some of the most popular environments—such as Apache Hadoop YARN and Kubernetes—and can operate in different modes.
 
 #### Understanding Spark Application Concepts
 
@@ -194,3 +194,30 @@
         a. A failure has occurred in the query (either a processing error or a failure in the cluster).
         b. The query is explicitly stopped using streamingQuery.stop().
         c. If the trigger is set to Once, then the query will stop on its own after executing a single micro-batch containing all the available data.
+
+- Dynamic Partition Pruning
+    - The idea behind dynamic partition pruning (DPP) is to skip over the data you don't need in a query's results. 
+    - The typical scenario where DPP is optimal is when you are joining two tables: a fact table (partitioned over multiple columns) and a dimension table (nonpartitioned).
+    - The key optimization technique in DPP is to take the result of the filter from the dimension table and inject it into the fact table as part of the scan operation to limit the data read.
+
+- Adaptive Query Execution 
+    - Adaptive Query Execution (AQE) reoptimizes and adjusts query plans based on runtime statistics collected in the process of query execution. It attempts to to do the following at runtime:
+        • Reduce the number of reducers in the shuffle stage by decreasing the number of shuffle partitions.
+        • Optimize the physical execution plan of the query, for example by converting a SortMergeJoin into a BroadcastHashJoin where appropriate.
+        • Handle data skew during a join.
+
+- The AQE framework
+    - Spark operations in a query are pipelined and executed in parallel processes, but a shuffle or broadcast exchange breaks this pipeline, because the output of one stage is needed as input to the next stage. 
+    - These breaking points are called materialization points in a query stage, and they present an opportunity to reoptimize and reexamine the query.
+    - Here are the conceptual steps the AQE framework iterates over:
+        1. All the leaf nodes, such as scan operations, of each stage are executed.
+        2. Once the materialization point finishes executing, it's marked as complete, and all the relevant statistics garnered during execution are updated in its logical plan.
+        3. Based on these statistics, such as number of partitions read, bytes of data read, etc., the framework runs the Catalyst optimizer again to understand whether it can:
+            a. Coalesce the number of partitions to reduce the number of reducers to read shuffle data.
+            b. Replace a sort merge join, based on the size of tables read, with a broadcast join.
+            c. Try to remedy a skew join.
+            d. Create a new optimized logical plan, followed by a new optimized physical plan.
+        This process is repeated until all the stages of the query plan are executed.
+    - Two Spark SQL configurations dictate how AQE will reduce the number of reducers:
+        • spark.sql.adaptive.coalescePartitions.enabled (set to true)
+        • spark.sql.adaptive.skewJoin.enabled (set to true)
