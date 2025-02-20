@@ -1,0 +1,56 @@
+# Spark: The Definitive Guide
+
+- Spark Applications consist of a driver process and a set of executor processes. The driver process runs your main() function, sits on a node in the cluster, and is responsible for three things:
+    - maintaining information about the Spark Application; 
+    - responding to a user’s program or input;
+    - and analyzing, distributing, and scheduling work across the executors (discussed momentarily).
+
+- The driver process is absolutely essential—it’s the heart of a Spark Application and maintains all relevant information during the lifetime of the application.
+
+- The executors are responsible for actually carrying out the work that the driver assigns them. This means that each executor is responsible for only two things: 
+    - executing code assigned to it by the driver, 
+    - and reporting the state of the computation on that executor back to the driver node.
+
+- Starting Spark
+    - When you start Spark in this interactive mode, you implicitly create a SparkSession that manages the Spark Application. 
+    - When you start it through a standalone application, you must create the SparkSession object yourself in your application code.
+
+- The SparkSession
+    - The SparkSession instance is the way Spark executes user-defined manipulations across the cluster. 
+    - There is a one-to-one correspondence between a SparkSession and a Spark Application.
+
+- DataFrames
+    - A DataFrame is the most common Structured API and simply represents a table of data with rows and columns. 
+    - The list that defines the columns and the types within those columns is called the schema. 
+
+- Partitions
+    - To allow every executor to perform work in parallel, Spark breaks up the data into chunks called partitions. 
+    - A partition is a collection of rows that sit on one physical machine in your cluster. 
+    - A DataFrame’s partitions represent how the data is physically distributed across the cluster of machines during execution.
+
+- Transformations
+    - Transformations are the core of how you express your business logic using Spark. 
+    - There are two types of transformations: those that specify narrow dependencies, and those that specify wide dependencies.
+    - Transformations consisting of narrow dependencies (we’ll call them narrow transformations) are those for which each input partition will contribute to only one output partition.
+    - A wide dependency (or wide transformation) style transformation will have input partitions contributing to many output partitions. 
+    - You will often hear this referred to as a shuffle whereby Spark will exchange partitions across the cluster. 
+    - With narrow transformations, Spark will automatically perform an operation called pipelining, meaning that if we specify multiple filters on DataFrames, they’ll all be performed in-memory. 
+    - The same cannot be said for shuffles. When we perform a shuffle, Spark writes the results to disk.
+
+- Lazy Evaluation
+    - Lazy evaulation means that Spark will wait until the very last moment to execute the graph of computation instructions. 
+    - In Spark, instead of modifying the data immediately when you express some operation, you build up a plan of transformations that you would like to apply to your source data. 
+    - By waiting until the last minute to execute the code, Spark compiles this plan from your raw DataFrame transformations to a streamlined physical plan that will run as efficiently as possible across the cluster. 
+    - This provides immense benefits because Spark can optimize the entire data flow from end to end. 
+    - An example of this is something called predicate pushdown on DataFrames. 
+    - If we build a large Spark job but specify a filter at the end that only requires us to fetch one row from our source data, the most efficient way to execute this is to access the single record that we need. 
+    - Spark will actually optimize this for us by pushing the filter down automatically.
+
+- Actions
+    - Transformations allow us to build up our logical transformation plan. To trigger the computation, we run an action. 
+    - An action instructs Spark to compute a result from a series of transformations.
+
+- Spark UI
+    - You can monitor the progress of a job through the Spark web UI. The Spark UI is available on port 4040 of the driver node. 
+    - If you are running in local mode, this will be http://localhost:4040.
+    - The Spark UI displays information on the state of your Spark jobs, its environment, and cluster state. It’s very useful, especially for tuning and debugging.
