@@ -54,3 +54,20 @@
     - You can monitor the progress of a job through the Spark web UI. The Spark UI is available on port 4040 of the driver node. 
     - If you are running in local mode, this will be http://localhost:4040.
     - The Spark UI displays information on the state of your Spark jobs, its environment, and cluster state. It’s very useful, especially for tuning and debugging.
+
+- Overview of Structured API Execution
+    1. Write DataFrame/Dataset/SQL Code.
+    2. If valid code, Spark converts this to a Logical Plan.
+    3. Spark transforms this Logical Plan to a Physical Plan, checking for optimizations along the way.
+    4. Spark then executes this Physical Plan (RDD manipulations) on the cluster.
+
+- Logical Planning
+    - This logical plan only represents a set of abstract transformations that do not refer to executors or drivers, it’s purely to convert the user’s set of expressions into the most optimized version. It does this by converting user code into an unresolved logical plan. 
+    - This plan is unresolved because although your code might be valid, the tables or columns that it refers to might or might not exist. 
+    - Spark uses the catalog, a repository of all table and DataFrame information, to resolve columns and tables in the analyzer. 
+    - The analyzer might reject the unresolved logical plan if the required table or column name does not exist in the catalog. 
+    - If the analyzer can resolve it, the result is passed through the Catalyst Optimizer, a collection of rules that attempt to optimize the logical plan by pushing down predicates or selections. 
+    - Packages can extend the Catalyst to include their own rules for domain-specific optimizations.
+
+- Physical Planning
+    - The physical plan, often called a Spark plan, specifies how the logical plan will execute on the cluster by generating different physical execution strategies and comparing them through a cost model.
