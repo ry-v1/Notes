@@ -93,3 +93,20 @@
 
 - Coalesce
     - Coalesce will not incur a full shuffle and will try to combine partitions.
+
+- How Spark Performs Joins 
+    - To understand how Spark performs joins, you need to understand the two core resources at play: the node-to-node communication strategy and per node computation strategy.
+    - Spark approaches cluster communication in two different ways during joins. It either incurs a shuffle join, which results in an all-to-all communication or a broadcast join.
+
+    - When you join a big table to another big table, you end up with a shuffle join.
+    - In a shuffle join, every node talks to every other node and they share data according to which node has a certain key or set of keys (on which you are joining). 
+    - These joins are expensive because the network can become congested with traffic, especially if your data is not partitioned well.
+
+    - When the table is small enough to fit into the memory of a single worker node, with some breathing room of course, we can optimize our join. Although we can use a big table-to-big table communication strategy, it can often be more efficient to use a broadcast join. 
+    - What this means is that we will replicate our small DataFrame onto every worker node in the cluster (be it located on one machine or many). 
+    - Now this sounds expensive. However, what this does is prevent us from performing the all-to-all communication during the entire join process. 
+    - Instead, we perform it only once at the beginning and then let each individual worker node perform the work without having to wait or communicate with any other worker node
+    - At the beginning of this join will be a large communication. However, immediately after that first, there will be no further communication between nodes.
+    - This means that joins will be performed on every single node individually, making CPU the biggest bottleneck. 
+
+    - When performing joins with small tables, it's usually best to let Spark decide how to join them. You can always force a broadcast join if you're noticing strange behavior.
