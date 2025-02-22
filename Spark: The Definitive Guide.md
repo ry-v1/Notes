@@ -71,3 +71,25 @@
 
 - Physical Planning
     - The physical plan, often called a Spark plan, specifies how the logical plan will execute on the cluster by generating different physical execution strategies and comparing them through a cost model.
+
+- Schemas
+    - A schema defines the column names and types of a DataFrame. We can either let a data source define the schema (called schema-on-read) or we can define it explicitly ourselves.
+    - A schema is a StructType made up of a number of fields,
+        - StructFields, that have a name, type, 
+        - a Boolean flag which specifies whether that column can contain missing or null values, and, 
+        - users can optionally specify associated metadata with that column.
+
+- Columns
+    - There are a lot of different ways to construct and refer to columns but the two simplest ways are by using the col or column functions.
+    - printSchema : to see a DataFrame's columns
+    - columns : property to programmatically access columns
+
+- Expressions
+    - An expression is a set of transformations on one or more values in a record in a DataFrame.
+
+- Repartition
+    - Repartition will incur a full shuffle of the data, regardless of whether one is necessary. 
+    - This means that you should typically only repartition when the future number of partitions is greater than your current number of partitions or when you are looking to partition by a set of columns.
+
+- Coalesce
+    - Coalesce will not incur a full shuffle and will try to combine partitions.
