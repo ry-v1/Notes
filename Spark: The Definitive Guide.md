@@ -110,3 +110,9 @@
     - This means that joins will be performed on every single node individually, making CPU the biggest bottleneck. 
 
     - When performing joins with small tables, it's usually best to let Spark decide how to join them. You can always force a broadcast join if you're noticing strange behavior.
+
+- Spark-Managed Tables
+    - Tables store two important pieces of information. The data within the tables as well as the data about the tables; that is, the metadata. 
+    - You can have Spark manage the metadata for a set of files as well as for the data. 
+    - When you define a table from files on disk, you are defining an unmanaged table. 
+    - When you use saveAsTable on a DataFrame, you are creating a managed table for which Spark will track of all of the relevant information.
