@@ -116,3 +116,12 @@
     - You can have Spark manage the metadata for a set of files as well as for the data. 
     - When you define a table from files on disk, you are defining an unmanaged table. 
     - When you use saveAsTable on a DataFrame, you are creating a managed table for which Spark will track of all of the relevant information.
+
+- Distributed Shared Variables
+    - Broadcast Variables
+        - Broadcast variables are a way you can share an immutable value efficiently around the cluster without encapsulating that variable in a function closure.
+        - Broadcast variables are shared, immutable variables that are cached on every machine in the cluster instead of serialized with every single task.
+    - Accumulators
+        - Accumulators are a way of updating a value inside of a variety of transformations and propagating that value to the driver node in an efficient and fault-tolerant way.
+        - For accumulator updates performed inside actions only, Spark guarantees that each task's update to the accumulator will be applied only once, meaning that restarted tasks will not update the value. 
+        - In transformations, you should be aware that each task's update can be applied more than once if tasks or job stages are reexecuted.
