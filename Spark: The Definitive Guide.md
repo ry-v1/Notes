@@ -125,3 +125,16 @@
         - Accumulators are a way of updating a value inside of a variety of transformations and propagating that value to the driver node in an efficient and fault-tolerant way.
         - For accumulator updates performed inside actions only, Spark guarantees that each task's update to the accumulator will be applied only once, meaning that restarted tasks will not update the value. 
         - In transformations, you should be aware that each task's update can be applied more than once if tasks or job stages are reexecuted.
+
+- Execution Modes
+    - Cluster mode
+        - In cluster mode, a user submits a pre-compiled JAR, Python script, or R script to a cluster manager. 
+        - The cluster manager then launches the driver process on a worker node inside the cluster, in addition to the executor processes. 
+        - This means that the cluster manager is responsible for maintaining all Spark Application-related processes.
+    - Client mode
+        - Client mode is nearly the same as cluster mode except that the Spark driver remains on the client machine that submitted the application. 
+        - This means that the client machine is responsible for maintaining the Spark driver process, and the cluster manager maintains the executor processses.
+    - Local mode
+        - Local mode is a significant departure from the previous two modes: it runs the entire Spark Application on a single machine. 
+        - It achieves parallelism through threads on that single machine.
+        - This is a common way to learn Spark, to test your applications, or experiment iteratively with local development.
