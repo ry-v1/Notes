@@ -2,10 +2,10 @@
 
 - Spark Applications consist of a driver process and a set of executor processes. The driver process runs your main() function, sits on a node in the cluster, and is responsible for three things:
     - maintaining information about the Spark Application; 
-    - responding to a user’s program or input;
+    - responding to a user's program or input;
     - and analyzing, distributing, and scheduling work across the executors (discussed momentarily).
 
-- The driver process is absolutely essential—it’s the heart of a Spark Application and maintains all relevant information during the lifetime of the application.
+- The driver process is absolutely essential—it's the heart of a Spark Application and maintains all relevant information during the lifetime of the application.
 
 - The executors are responsible for actually carrying out the work that the driver assigns them. This means that each executor is responsible for only two things: 
     - executing code assigned to it by the driver, 
@@ -26,7 +26,7 @@
 - Partitions
     - To allow every executor to perform work in parallel, Spark breaks up the data into chunks called partitions. 
     - A partition is a collection of rows that sit on one physical machine in your cluster. 
-    - A DataFrame’s partitions represent how the data is physically distributed across the cluster of machines during execution.
+    - A DataFrame's partitions represent how the data is physically distributed across the cluster of machines during execution.
 
 - Transformations
     - Transformations are the core of how you express your business logic using Spark. 
@@ -138,3 +138,11 @@
         - Local mode is a significant departure from the previous two modes: it runs the entire Spark Application on a single machine. 
         - It achieves parallelism through threads on that single machine.
         - This is a common way to learn Spark, to test your applications, or experiment iteratively with local development.
+
+- The Life Cycle of a Spark Application (Outside Spark)
+    - Client Request
+        - The first step is for you to submit an actual application. This will be a pre-compiled JAR or library. 
+        - At this point, you are executing code on your local machine and you’re going to make a request to the cluster manager driver node.
+        - Here, we are explicitly asking for resources for the Spark driver process only. 
+        - We assume that the cluster manager accepts this offer and places the driver onto a node in the cluster. 
+        - The client process that submitted the original job exits and the application is off and running on the cluster.
