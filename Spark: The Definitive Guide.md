@@ -146,3 +146,9 @@
         - Here, we are explicitly asking for resources for the Spark driver process only. 
         - We assume that the cluster manager accepts this offer and places the driver onto a node in the cluster. 
         - The client process that submitted the original job exits and the application is off and running on the cluster.
+
+    - Launch
+        - Now that the driver process has been placed on the cluster, it begins running user code
+        - This code must include a SparkSession that initializes a Spark cluster (e.g., driver + executors). 
+        - The SparkSession will subsequently communicate with the cluster manager, asking it to launch Spark executor processes across the cluster. 
+        - The number of executors and their relevant configurations are set by the user via the command-line arguments in the original spark-submit call.
