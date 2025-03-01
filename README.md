@@ -1,6 +1,6 @@
 # Notes
 
-Notes from the books I am reading!!!
+Notes from the books.
 
 - 100 SQL Server Mistakes and How to Avoid Them
 - Apache Iceberg - The Definitive Guide
