@@ -157,3 +157,8 @@
         - Now that we have a “Spark Cluster, ” Spark goes about its merry way executing code. 
         - The driver and the workers communicate among themselves, executing code and moving data around. 
         - The driver schedules tasks onto each worker, and each worker responds with the status of those tasks and success or failure.
+    
+    - Completion
+        - After a Spark Application completes, the driver processs exits with either success or failure. 
+        - The cluster manager then shuts down the executors in that Spark cluster for the driver. 
+        - At this point, you can see the success or failure of the Spark Application by asking the cluster manager for this information.
