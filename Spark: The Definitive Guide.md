@@ -152,3 +152,8 @@
         - This code must include a SparkSession that initializes a Spark cluster (e.g., driver + executors). 
         - The SparkSession will subsequently communicate with the cluster manager, asking it to launch Spark executor processes across the cluster. 
         - The number of executors and their relevant configurations are set by the user via the command-line arguments in the original spark-submit call.
+    
+    - Execution
+        - Now that we have a “Spark Cluster, ” Spark goes about its merry way executing code. 
+        - The driver and the workers communicate among themselves, executing code and moving data around. 
+        - The driver schedules tasks onto each worker, and each worker responds with the status of those tasks and success or failure.
