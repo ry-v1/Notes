@@ -162,3 +162,8 @@
         - After a Spark Application completes, the driver processs exits with either success or failure. 
         - The cluster manager then shuts down the executors in that Spark cluster for the driver. 
         - At this point, you can see the success or failure of the Spark Application by asking the cluster manager for this information.
+
+- The Life Cycle of a Spark Application (Inside Spark)
+    -The SparkSession
+        - The first step of any Spark Application is creating a SparkSession. 
+        - In many interactive modes, this is done for you, but in an application, you must do it manually.
