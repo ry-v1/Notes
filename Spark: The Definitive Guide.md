@@ -167,3 +167,8 @@
     -The SparkSession
         - The first step of any Spark Application is creating a SparkSession. 
         - In many interactive modes, this is done for you, but in an application, you must do it manually.
+    - The SparkContext
+        - A SparkContext object within the SparkSession represents the connection to the Spark cluster.
+        - This class is how you communicate with some of Spark’s lower-level APIs, such as RDDs. 
+        - It is commonly stored as the variable sc in older examples and documentation. Through a SparkContext, you can create RDDs, accumulators, and broadcast variables, and you can run code on the cluster.
+        - For the most part, you should not need to explicitly initialize a SparkContext; you should just be able to access it through the SparkSession.
