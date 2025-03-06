@@ -172,3 +172,6 @@
         - This class is how you communicate with some of Spark’s lower-level APIs, such as RDDs. 
         - It is commonly stored as the variable sc in older examples and documentation. Through a SparkContext, you can create RDDs, accumulators, and broadcast variables, and you can run code on the cluster.
         - For the most part, you should not need to explicitly initialize a SparkContext; you should just be able to access it through the SparkSession.
+    - A Spark Job
+        - In general, there should be one Spark job for one action. Actions always return results. 
+        - Each job breaks down into a series of stages, the number of which depends on how many shuffle operations need to take place.
