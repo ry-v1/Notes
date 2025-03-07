@@ -181,3 +181,9 @@
         - A shuffle represents a physical repartitioning of the data—for example, sorting a DataFrame, or grouping data that was loaded from a file by key (which requires sending records with the same key to the same node). 
         - This type of repartitioning requires coordinating across executors to move data around. 
         - Spark starts a new stage after each shuffle, and keeps track of what order the stages must run in to compute the final result.
+    - Tasks
+        - Stages in Spark consist of tasks. 
+        - Each task corresponds to a combination of blocks of data and a set of transformations that will run on a single executor. 
+        - If there is one big partition in our dataset, we will have one task. If there are 1,000 little partitions, we will have 1,000 tasks that can be executed in parallel. 
+        - A task is just a unit of computation applied to a unit of data (the partition). 
+        - Partitioning your data into a greater number of partitions means that more can be executed in parallel. This is not a panacea, but it is a simple place to begin with optimization.
