@@ -6,3 +6,4 @@ Notes from the books.
 - Apache Iceberg - The Definitive Guide
 - Learning Spark
 - Spark: The Definitive Guide
+- Delta Lake - The Definitive Guide
