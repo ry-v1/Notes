@@ -28,3 +28,14 @@
     - Metadata: Metadata in Delta Lake includes information about the table’s schema, partitioning, and configuration settings. This metadata is stored in the transaction log and can be retrieved using SQL, Spark, Rust, and Python APIs. The metadata helps manage and optimize the table by providing information for schema enforcement and evolution, partitioning strategies, and data skipping.
     - Schema: A Delta Lake table’s schema defines the data’s structure, including its columns, data types, and so on. The schema is enforced on write, ensuring that all data written to the table adheres to the defined structure. Delta Lake supports schema evolution (add new columns, rename columns, etc.), allowing the schema to be updated as the data changes over time.
     - Checkpoints: Checkpoints are periodic snapshots of the transaction log that help speed up the recovery process. Delta Lake consolidates the state of the transaction log by default every 10 transactions. This allows client readers to quickly catch up from the most recent checkpoint rather than replaying the entire transaction log from the beginning. Checkpoints are stored as Parquet files and are created automatically by Delta Lake.
+
+- Delta Transaction Protocol
+    - The Delta transaction log protocol is the specification defining how clients interact with the table in a consistent manner. 
+    - At its core, all interactions with the Delta table must begin by reading the Delta transaction log to know what files to read. 
+    - When a client modifies the data, the client initiates the creation of new data files (i.e., Parquet files) and then inserts new metadata into the transaction log to commit modifications to the table.
+    
+    - Serializable ACID writes : Multiple writers can modify a Delta table concurrently while maintaining ACID semantics.
+    - Snapshot isolation for reads : Readers can read a consistent snapshot of a Delta table, even in the face of concurrent writes.
+    - Scalability to billions of partitions or files: Queries against a Delta table can be planned on a single machine or in parallel.
+    - Self-describing : All metadata for a Delta table is stored alongside the data. This design eliminates the need to maintain a separate metastore to read the data and allows static tables to be copied or moved using standard filesystem tools.
+    - Support for incremental processing : Readers can tail the Delta log to determine what data has been added in a given period of time, allowing for efficient streaming.
