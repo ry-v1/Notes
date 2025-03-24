@@ -39,3 +39,8 @@
     - Scalability to billions of partitions or files: Queries against a Delta table can be planned on a single machine or in parallel.
     - Self-describing : All metadata for a Delta table is stored alongside the data. This design eliminates the need to maintain a separate metastore to read the data and allows static tables to be copied or moved using standard filesystem tools.
     - Support for incremental processing : Readers can tail the Delta log to determine what data has been added in a given period of time, allowing for efficient streaming.
+
+- Multiversion Concurrency Control (MVCC) File and Data Observations
+    - For deletes on object stores, it is faster to create a new file or files comprising the unaffected rows rather than modifying the existing Parquet file(s). 
+    - This approach also provides the advantage of multiversion concurrency control (MVCC). 
+    - MVCC is a database optimization technique that creates copies of the data, thus allowing data to be safely read and updated concurrently. This technique also allows Delta Lake to provide time travel. Therefore, Delta Lake creates multiple files for these actions, providing atomicity, MVCC, and speed.
