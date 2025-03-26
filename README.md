@@ -7,3 +7,4 @@ Notes from the books.
 - Learning Spark
 - Spark: The Definitive Guide
 - Delta Lake - The Definitive Guide
+- SQL Performance Explained
