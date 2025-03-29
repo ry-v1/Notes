@@ -19,3 +19,12 @@
 ##### The Search Tree (B-Tree)
     - The index leaf nodes are stored in an arbitrary order—the position on the disk does not correspond to the logical position according to the index order.
     - A database needs a second structure to find the entry among the shuffled pages quickly: a balanced search tree in short: the B-tree.
+    - A B-tree is a balanced tree—not a binary tree.
+
+##### Slow Indexes, Part I
+    - The first ingredient for a slow index lookup is the leaf node chain.
+    - The database must read the next leaf node to see if there are any more matching entries. That means that an index lookup not only needs to perform the tree traversal,it also needs to follow the leaf node chain.
+    - The second ingredient for a slow index lookup is accessing the table.
+    - Even a single leaf node might contain many hits—often hundreds. The corresponding table data is usually scattered across many table blocks. That means that there is an additional table access for each hit.
+
+    - An index lookup requires three steps: (1) the tree traversal; (2) following the leaf node chain; (3) fetching the table data. The tree traversal is the only step that has an upper bound for the number of accessed blocks—the index depth. The other two steps might need to access many blocks—they cause a slow index lookup.
