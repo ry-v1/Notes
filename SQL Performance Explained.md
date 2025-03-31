@@ -36,4 +36,12 @@
     - The where clause cannot match multiple rows because the primary key constraint ensures uniqueness of the key values. The database does not need to follow the index leaf nodes—it is enough to traverse the index tree.
     - A primary key does not necessarily need a unique index—you can use a non-unique index as well.
     - One of the reasons for using non-unique indexes for a primary keys are deferrable constraints. As opposed to regular constraints, which are validated during statement execution, the database postpones the validation of deferrable constraints until the transaction is committed. Deferred constraints are required for inserting data into tables with circular dependencies.
-    
+
+##### Concatenated Indexes
+    - Even though the database creates the index for the primary key automatically, there is still room for manual refinements if the key consists of multiple columns. In that case the database creates an index on all primary key columns—a so-called concatenated index (also known as multi-column, composite or combined index). 
+    - Note that the column order of a concatenated index has great impact on its usability so it must be chosen carefully.
+    - Whenever a query uses the complete primary key, the database can use an INDEX UNIQUE SCAN—no matter how many columns the index has. 
+    - But when using only one of the key columns, the execution plan reveals that the database does not use the index. Instead it performs a FULL TABLE SCAN. As a result the database reads the entire table and evaluates every row against the where clause.
+    - A concatenated index is one index across multiple columns.
+    - The most important consideration when defining a concatenated index is how to choose the column order so it can be used as often as possible.
+    - To define an optimal index you must understand more than just how indexes work—you must also know how the application queries the data. This means you have to know the column combinations that appear in the where clause.
