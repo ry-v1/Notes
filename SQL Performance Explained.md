@@ -55,3 +55,8 @@
     - A cost-based optimizer uses statistics about tables, columns, and indexes. 
     - Most statistics are collected on the column level: the number of distinct values, the smallest and largest values (data range), the number of NULL occurrences and the column histogram (data distribution). The most important statistical value for a table is its size (in rows and blocks).
     - The most important index statistics are the tree depth, the number of leaf nodes, the number of distinct keys and the clustering factor. The optimizer uses these values to estimate the selectivity of the where clause predicates.
+
+##### Functions
+    - An index whose definition contains functions or expressions is a so-called function-based index (FBI). 
+    - Instead of copying the column data directly into the index, a function-based index applies the function first and puts the result into the index.
+    
