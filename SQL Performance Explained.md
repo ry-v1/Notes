@@ -60,3 +60,21 @@
     - An index whose definition contains functions or expressions is a so-called function-based index (FBI). 
     - Instead of copying the column data directly into the index, a function-based index applies the function first and puts the result into the index.
     
+##### User-Defined Functions
+    - It is, not possible to refer to the current time in an index definition, neither directly nor indirectly.
+    - Only functions that always return the same result for the same parameters functions that are deterministic—can be indexed.
+
+##### Over-Indexing
+    - Every index causes ongoing maintenance. Function-based indexes are particularly troublesome because they make it very easy to create redundant indexes.
+    - Unify the access path so that one index can be used by several queries.
+    - Always aim to index the original data as that is often the most useful information you can put into an index.
+
+##### Parameterized Queries
+    - Bind parameters—also called dynamic parameters or bind variables—are an alternative way to pass data to the database. 
+    - Instead of putting the values directly into the SQL statement, you just use a placeholder like ?, :name or @name and provide the actual values using a separate API call.
+    - Two good reasons to use bind parameters in programs:
+        - Security : 
+            - Bind variables are the best way to prevent SQL injection.
+        - Performance : 
+            - Databases with an execution plan cache like SQL Server and the Oracle database can reuse an execution plan when executing the same statement multiple times. It saves effort in rebuilding the execution plan but works only if the SQL statement is exactly the same. If you put different values into the SQL statement, the database handles it like a different statement and recreates the execution plan.
+            - When using bind parameters you do not write the actual values but instead insert placeholders into the SQL statement. That way the statements do not change when executing them with different values.
