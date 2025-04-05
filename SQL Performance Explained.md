@@ -81,3 +81,9 @@
     - When using bind parameters, the optimizer has no concrete values available to determine their frequency. It then just assumes an equal distribution and always gets the same row count estimates and cost values. In the end, it will always select the same execution plan.
     - Column histograms are most useful if the values are not uniformly distributed.
     - For columns with uniform distribution, it is often sufficient to divide the number of distinct values by the number of rows in the table. This method also works when using bind parameters.
+    - Not using bind parameters is like recompiling a program every time.
+    - Bind parameters cannot change the structure of an SQL statement. That means you cannot use bind parameters for table or column names.
+
+##### Searching for Ranges - Greater, Less and BETWEEN
+    - Rule of thumb: index for equality first—then for ranges.
+    
