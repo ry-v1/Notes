@@ -86,4 +86,5 @@
 
 ##### Searching for Ranges - Greater, Less and BETWEEN
     - Rule of thumb: index for equality first—then for ranges.
-    
+    - A single LIKE expression can therefore contain two predicate types: (1) the part before the first wildcard as an access predicate; (2) the other characters as a filter predicate.
+    - The opposite case is also possible: a LIKE expression that starts with a wildcard. Such a LIKE expression cannot serve as an access predicate. The database has to scan the entire table if there are no other conditions that provide access predicates.
