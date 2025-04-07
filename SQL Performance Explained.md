@@ -88,3 +88,12 @@
     - Rule of thumb: index for equality first—then for ranges.
     - A single LIKE expression can therefore contain two predicate types: (1) the part before the first wildcard as an access predicate; (2) the other characters as a filter predicate.
     - The opposite case is also possible: a LIKE expression that starts with a wildcard. Such a LIKE expression cannot serve as an access predicate. The database has to scan the entire table if there are no other conditions that provide access predicates.
+
+##### Obfuscated Conditions
+    - Obfuscated conditions are where clauses that are phrased in a way that prevents proper index usage.
+    - Most obfuscations involve DATE types.
+    - Always consider using an explicit range condition when comparing dates.
+    - Do not convert the table column, instead convert the search term.
+    - Use numeric types to store numbers.
+    - Use a redundant condition on the most significant column when a range condition combines multiple columns.
+    - Sometimes we have the reverse case and might want to obfuscate a condition intentionally so it cannot be used anymore as access predicate. Without knowing the wildcard’s position in the search term, it is impossible to give a qualified answer. The optimizer has no other choice than to “guess”. If you know that there is always a leading wildcard, you can obfuscate the LIKE condition intentionally so that the optimizer can no longer consider the index.
