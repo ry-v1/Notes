@@ -97,3 +97,7 @@
     - Use numeric types to store numbers.
     - Use a redundant condition on the most significant column when a range condition combines multiple columns.
     - Sometimes we have the reverse case and might want to obfuscate a condition intentionally so it cannot be used anymore as access predicate. Without knowing the wildcard’s position in the search term, it is impossible to give a qualified answer. The optimizer has no other choice than to “guess”. If you know that there is always a leading wildcard, you can obfuscate the LIKE condition intentionally so that the optimizer can no longer consider the index.
+
+### Performance and Scalability
+    - Scalability shows the dependency of performance on factors like the data volume. A performance value is just a single data point on a scalability chart.
+    - Filter predicates are like unexploded ordnance devices. They can explode at any time.
