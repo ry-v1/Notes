@@ -101,3 +101,8 @@
 ### Performance and Scalability
     - Scalability shows the dependency of performance on factors like the data volume. A performance value is just a single data point on a scalability chart.
     - Filter predicates are like unexploded ordnance devices. They can explode at any time.
+    - No matter how insignificant the predicate information appears in the execution plan, it has a great impact on performance—especially when the system grows.
+
+### The Join Operation
+    - The more complex the statement the more important using bind parameters becomes. Not using bind parameters is like recompiling a program every time.
+    - Execute joins in the database.
