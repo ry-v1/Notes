@@ -106,3 +106,6 @@
 ### The Join Operation
     - The more complex the statement the more important using bind parameters becomes. Not using bind parameters is like recompiling a program every time.
     - Execute joins in the database.
+    - Indexing join predicates doesn’t improve hash join performance.
+
+### Clustering Data
