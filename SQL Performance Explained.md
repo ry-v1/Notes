@@ -112,3 +112,6 @@
     - The correlation between index order and table order is a performance benchmark—the so-called index clustering factor.
     - The index clustering factor is an indirect measure of the probability that two succeeding index entries refer to the same table block. The optimizer takes this probability into account when calculating the cost value of the TABLE ACCESS BY INDEX ROWID operation.
     - If an index prevents a table access it is also called a covering index. The term is misleading, however, because it sounds like an index property. The phrase index-only scan correctly suggests that it is an execution plan operation.
+    - Always aim to index the original data as that is often the most useful information you can put into an index. Avoid function-based indexing for expressions that cannot be used as access predicates.
+
+### Sorting and Grouping
