@@ -115,3 +115,15 @@
     - Always aim to index the original data as that is often the most useful information you can put into an index. Avoid function-based indexing for expressions that cannot be used as access predicates.
 
 ### Sorting and Grouping
+    - An indexed order by execution not only saves the sorting effort, however; it is also able to return the first results without processing all input data. The order by is thus executed in a pipelined manner.
+    - If the index order corresponds to the order by clause, the database can omit the explicit sort operation.
+    - If the database uses a sort operation even though you expected a pipelined execution, it can have two reasons: 
+        - (1) the execution plan with the explicit sort operation has a better cost value; 
+        - (2) the index order in the scanned index range does not correspond to the order by clause
+    - Use the full index definition in the order by clause to find the reason for an explicit sort operation.
+    - Databases can read indexes in both directions.
+    - When using mixed ASC and DESC modifiers in the order by clause, you must define the index likewise in order to use it for a pipelined order by. This does not affect the index’s usability for the where clause.
+    - SQL databases use two entirely different group by algorithms. 
+        - The first one, the hash algorithm, aggregates the input records in a temporary hash table. Once all input records are processed, the hash table is returned as the result. 
+        - The second algorithm, the sort/group algorithm, first sorts the input data by the grouping key so that the rows of each group follow each other in immediate succession. Afterwards, the database just needs to aggregate them. 
+        - In general, both algorithms need to materialize an intermediate state, so they are not executed in a pipelined manner. Nevertheless the sort/group algorithm can use an index to avoid the sort operation, thus enabling a pipelined group by.
