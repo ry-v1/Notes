@@ -127,3 +127,9 @@
         - The first one, the hash algorithm, aggregates the input records in a temporary hash table. Once all input records are processed, the hash table is returned as the result. 
         - The second algorithm, the sort/group algorithm, first sorts the input data by the grouping key so that the rows of each group follow each other in immediate succession. Afterwards, the database just needs to aggregate them. 
         - In general, both algorithms need to materialize an intermediate state, so they are not executed in a pipelined manner. Nevertheless the sort/group algorithm can use an index to avoid the sort operation, thus enabling a pipelined group by.
+
+### Partial Results
+    - Using the correct syntax is only half the story because efficiently terminating the execution requires the underlying operations to be executed in a pipelined manner That means the order by clause must be covered by an index
+    - A pipelined top-N query doesn’t need to read and sort the entire result set.
+    - Paging requires a deterministic sort order.
+    - Even if the functional specifications only require sorting “by date, latest first”, we as the developers must make sure the order by clause yields a deterministic row sequence. For this purpose, we might need to extend the order by clause with arbitrary columns just to make sure we get a deterministic row sequence. If the index that is used for the pipelined order by has additional columns, it is a good start to add them to the order by clause so we can continue using this index for the pipelined order by. If this still does not yield a deterministic sort order, just add any unique column(s) and extend the index accordingly.
