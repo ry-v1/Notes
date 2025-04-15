@@ -133,3 +133,12 @@
     - A pipelined top-N query doesn’t need to read and sort the entire result set.
     - Paging requires a deterministic sort order.
     - Even if the functional specifications only require sorting “by date, latest first”, we as the developers must make sure the order by clause yields a deterministic row sequence. For this purpose, we might need to extend the order by clause with arbitrary columns just to make sure we get a deterministic row sequence. If the index that is used for the pipelined order by has additional columns, it is a good start to add them to the order by clause so we can continue using this index for the pipelined order by. If this still does not yield a deterministic sort order, just add any unique column(s) and extend the index accordingly.
+
+### Modifying Data
+    - The number of indexes on a table is the most dominant factor for insert performance. The more indexes a table has, the slower the execution becomes. 
+    - The insert statement is the only operation that cannot directly benefit from indexing because it has no where clause.
+    - To optimize insert performance, it is very important to keep the number of indexes small.
+    - Use indexes deliberately and sparingly, and avoid redundant indexes whenever possible. This is also beneficial for delete and update statements.
+    - The delete statement works like a select that is followed by an extra step to delete the identified rows.
+    - Even delete and update statements have an execution plan.
+    - A delete statement without where clause is an obvious example in which the database cannot use an index, although this is a special case that has its own SQL command: truncate table. This command has the same effect as delete without where except that it deletes all rows in one shot. It is very fast but has two important side effects: (1) it does an implicit commit(exception: PostgreSQL); (2) it does not execute any triggers.
