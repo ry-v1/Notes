@@ -142,3 +142,9 @@
     - The delete statement works like a select that is followed by an extra step to delete the identified rows.
     - Even delete and update statements have an execution plan.
     - A delete statement without where clause is an obvious example in which the database cannot use an index, although this is a special case that has its own SQL command: truncate table. This command has the same effect as delete without where except that it deletes all rows in one shot. It is very fast but has two important side effects: (1) it does an implicit commit(exception: PostgreSQL); (2) it does not execute any triggers.
+    - An update statement must relocate the changed index entries to maintain the index order. For that, the database must remove the old entry and add the new one at the new location. 
+    - The response time is basically the same as for the respective delete and insert statements together.
+    - The update performance, just like insert and delete, also depends on the number of indexes on the table. 
+    - The only difference is that update statements do not necessarily affect all columns because they often modify only a few selected columns. Consequently, an update statement does not necessarily affect all indexes on the table but only those that contain updated columns.
+
+### 
