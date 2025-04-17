@@ -146,5 +146,3 @@
     - The response time is basically the same as for the respective delete and insert statements together.
     - The update performance, just like insert and delete, also depends on the number of indexes on the table. 
     - The only difference is that update statements do not necessarily affect all columns because they often modify only a few selected columns. Consequently, an update statement does not necessarily affect all indexes on the table but only those that contain updated columns.
-
-### 
