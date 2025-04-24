@@ -18,3 +18,4 @@
         - Buffer manager: This manager caches data pages in memory.
         - Recovery manager: This manager maintains the operation log and restoring the system state in case of a failure.
     - Together, transaction and lock managers are responsible for concurrency control: they guarantee logical and physical data integrity while ensuring that concurrent operations are executed as efficiently as possible.
+    

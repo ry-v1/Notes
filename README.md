@@ -9,3 +9,4 @@ Notes from the books.
     - Delta Lake - The Definitive Guide
     - SQL Performance Explained
     - Database Internals
+    - Snowflake - The Definitive Guide
