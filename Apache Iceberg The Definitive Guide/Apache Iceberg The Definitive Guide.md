@@ -57,11 +57,13 @@
     - Data lake has the ability to leverage different compute engines for different workloads.
     - In data lakes, there isn’t really any service that fulfills the needs of the storage engine function. 
     - Generally, the compute engine decides how to write the data, and then the data is usually never revisited and optimized, unless entire tables or partitions are rewritten, which is usually done on an ad hoc basis.
+    
     - Pros
         - Lower cost
         - Stores data in open formats
         - Handles unstructured data
         - Supports ML use cases
+    
     - Cons
         - Performance
         - Lack of ACID guarantees
@@ -91,25 +93,30 @@
         - This way, you can run transactions on your data lakehouse that either commit or fail and nothing in between.
         - A pessimistic concurrency model, which uses locks to prevent conflicts between transactions, assuming conflicts are likely to occur, was unavailable in Apache Iceberg at this time.
         - Concurrency guarantees are handled by the catalog, as it is typically a mechanism that has built-in ACID guarantees.
+    
     - Partition evolution
         - With Apache Iceberg you can update how the table is partitioned at any time without the need to rewrite the table and all its data. 
         - Since partitioning has everything to do with the metadata, the operations needed to make this change to your table's structure are quick and cheap.
+    
     - Hidden partitioning
         - In Iceberg, partitioning occurs in two parts: 
             - the column, which physical partitioning should be based on 
             - an optional transform to that value including functions such as bucket, truncate, year, month, day, and hour. 
             - The ability to apply a transform eliminates the need to create new columns just for partitioning.
+    
     - Row-level table operations
         - You can optimize the table's row-level update patterns to take one of two forms: copy-on-write (COW) or merge-on-read (MOR). 
         - When using COW, for a change of any row in a given datafile, the entire file is rewritten (with the row-level changemade in the new file) even if a single record in it is updated. 
         - When using MOR, for any row-level updates, only a new file that contains the changes to the affected row that is reconciled on reads is written. This gives flexibility to speed up heavy update and delete workloads.
+    
     - Time travel 
         - Apache Iceberg provides immutable snapshots, so the information for the table's historical state is accessible, allowing you to run queries on the state of the table at a given point in time in the past
+    
     - Version rollback
         - Not only does Iceberg's snapshot isolation allow you to query the data as it is, but it also reverts the table's current state to any of those previous snapshots.
+    
     - Schema evolution
         - Tables change, whether that means adding/removing a column, renaming a column, or changing a column's data type.
-
 
 ## The Architecture of Apache Iceberg
 
@@ -161,6 +168,7 @@
             - during read operations, engines will always see the latest version of the table. 
             - Query engines interact with the manifest lists to get information about partition specifications that help them skip the nonrequired manifest files for faster performance.
             - information from the manifest files, such as upper and lower bounds for a specific column, null value counts, and partition-specific data, is used by the engine for file pruning.
+            
         - Data layer
             - Query engines filter through the metadata files to read the datafiles required by a particular query efficiently.
             - On the write side, datafiles get written on the file storage, and the related metadata files are created and updated accordingly.
@@ -168,16 +176,19 @@
         - When a write query is initiated, it is sent to the engine for parsing. 
         - The catalog is then consulted to ensure consistency and integrity in the data and to write the data as per the defined partition strategies. 
         - The datafiles and metadata files are then written based on the query. 
-        - Finally, the catalog file is updated to reflect the latest metadata, enabling subsequent read operations
+        - Finally, the catalog file is updated to reflect the latest metadata, enabling subsequent read operations.
+        
     - Reading Queries in Apache Iceberg
         - When a read query is initiated, it is sent to the query engine first. 
         - The engine leverages the catalog to retrieve the latest metadata file location, which contains critical information about the tables schema and other metadata files, such as the manifest list that ultimately leads to the actual datafiles. 
         - Statistical information about columns is used in this process to limit the number of files being read, which helps improve query performance.
 
 ## Optimizing the Performance of Iceberg Tables
+    
     - Compaction
         - in the world of streaming or “real-time” data, where data is ingested as it is created, generating lots of files with only a few records in each.
         - The solution to this problem is to periodically take the data in all these small files and rewrite it into fewer larger files
+    
     - Compaction Strategies
         Binpack 
             - What it does - Combines files only; no global sorting (will do local sorting within tasks)
@@ -192,17 +203,23 @@
             another grouping)
             - Pros - If queries often rely on filters on multiple fields, this can improve read times even further.
             - Cons - This results in longer running compaction jobs compared to binpack.
-    - Keep in mind that compaction always honors the current partition spec, so if data from an old partition spec is rewritten, it will have the new partitioning rules applied.
+            - Keep in mind that compaction always honors the current partition spec, so if data from an old partition spec is rewritten, it will have the new partitioning rules applied.
+    
     - Partitioning
         - When a table is partitioned, instead of just sorting the order based on a field, it will write records with distinct values of the target field into their own datafiles.
+    
     - Hidden Partitioning
         - Instead of tracking it by relying on how files are physically laid out, Iceberg tracks the range of partition values at the snapshot and manifest levels
+    
     - Partition Evolution
         - the metadata tracks not only partition values but also historical partition schemes, allowing the partition schemes to evolve. 
+    
     - Row-level update modes in Apache Iceberg
+        
         - Copy-on-write: 
             - In this approach, if even a single row in a datafile is updated or deleted, that datafile is rewritten, and the new file takes its place in the new snapshot.
             - Fastest reads, Slowest updates/deletes
+        
         - Merge-on-read 
             - Instead of rewriting an entire datafile, you capture in a delete file the records to be updated in the existing file, with the delete file tracking which records should be ignored.
             - Merge-on-read (position deletes): Fast reads, Fast updates/deletes, Use regular compaction to minimize read costs.
@@ -218,6 +235,7 @@
         - Bloom filters are handy because they can help us avoid unnecessary data scans.
 
 ## Iceberg Catalogs
+
     - Hadoop Catalog
         - Hadoop catalog is that it doesn’t require any external systems to run. All it requires is a filesystem, thereby lowering the barrier to getting started with Iceberg.
         - it is not recommended for production usage.
@@ -251,6 +269,7 @@
         - In this situation that the new catalog's entry will be stale, with any changes made to the table using the current catalog. You shouldn't make any changes to the table using the new catalog, as all existing usage of the current catalog won't see those changes.
 
 ## Apache Iceberg in Production
+
     - history Metadata Table
         - made_current_at : represents the exact timestamp when the corresponding snapshot was made the current snapshot. This gives you a precise temporalmarker for when changes to the table were committed.
         - snapshot_id : serves as a unique identifier for each snapshot. This identifier enables you to track and reference specific snapshots within the table's history.
