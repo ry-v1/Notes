@@ -34,3 +34,20 @@
         - Snowflake’s unique architecture allows for separation of storage and compute, which means any virtual warehouse can access the same data as another, without any contention or impact on performance of the other warehouses. This is because each Snowflake virtual warehouse operates independently and does not share compute resources with other virtual warehouses
         - Resizing a Snowflake virtual warehouse is a manual process and can be done even while queries are running because a virtual warehouse does not have to be stopped or suspended to be resized. However, when a Snowflake virtual warehouse is resized, only subsequent queries will make use of the new size. Any queries already running will finish running while any queued queries will run on the newly sized virtual warehouse.
         - The value of the Auto Resume and Auto Suspend times should equal or exceed any regular gaps in your query workload. For example, if you have regular gaps of four minutes between queries, it wouldn’t be advisable to set Auto Suspend for less than four minutes. If you did, your virtual warehouse would be continually suspending and resuming, which could potentially result in higher costs since the minimum credit usage billed is 60 seconds. Therefore, unless you have a good reason for changing the default Auto Suspend and Auto Resume times, it is recommended to leave the default at 10 minutes.
+
+        - create a medium-sized virtual warehouse, with four clusters, that will automatically suspend after five minutes.
+        
+        ```sql
+            USE ROLE SYSADMIN;
+            CREATE WAREHOUSE WH WITH WAREHOUSE_SIZE = MEDIUM
+            AUTO_SUSPEND = 300 AUTO_RESUME = true INITIALLY_SUSPENDED = true;
+        ```
+        - It is a best practice to create a new virtual warehouse in a suspended state. Unless the Snowflake virtual warehouse is created initially in a suspended state, the initial creation of a Snowflake virtual warehouse could take time to provision compute resources.
+
+        - In order to scale up or down, we’ll use the ALTER command:
+
+        ```sql
+            USE ROLE SYSADMIN;
+            ALTER WAREHOUSE CH2_WH
+            SET WAREHOUSE_SIZE = LARGE;
+        ```
