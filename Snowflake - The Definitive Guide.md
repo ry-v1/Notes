@@ -36,7 +36,7 @@
         - The value of the Auto Resume and Auto Suspend times should equal or exceed any regular gaps in your query workload. For example, if you have regular gaps of four minutes between queries, it wouldn’t be advisable to set Auto Suspend for less than four minutes. If you did, your virtual warehouse would be continually suspending and resuming, which could potentially result in higher costs since the minimum credit usage billed is 60 seconds. Therefore, unless you have a good reason for changing the default Auto Suspend and Auto Resume times, it is recommended to leave the default at 10 minutes.
 
         - create a medium-sized virtual warehouse, with four clusters, that will automatically suspend after five minutes.
-        
+
         ```sql
             USE ROLE SYSADMIN;
             CREATE WAREHOUSE WH WITH WAREHOUSE_SIZE = MEDIUM
@@ -51,3 +51,40 @@
             ALTER WAREHOUSE CH2_WH
             SET WAREHOUSE_SIZE = LARGE;
         ```
+
+    - Centralized (Hybrid Columnar) Database Storage Layer
+        - Snowflake’s centralized database storage layer holds all data, including structured and semi-structured data.
+        - Each Snowflake database consists of one or more schemas, which are logical groupings of database objects such as tables and views.
+        - Snowflake automatically organizes stored data into micro-partitions, an optimized, immutable, compressed columnar format which is encrypted using AES-256 encryption. - - - Snowflake optimizes and compresses data to make metadata extraction and query processing easier and more efficient.
+        - Snowflake’s data storage layer is sometimes referred to as the remote disk layer. The underlying file system is implemented on Amazon, Microsoft, or Google Cloud.
+        - There are two unique features in the storage layer architecture: Time Travel and zero-copy cloning.
+        - Zero-copy cloning offers the user a way to snapshot a Snowflake database, schema, or table along with its associated data. There is no additional storage charge until changes are made to the cloned object, because zero-copy data cloning is a metadata-only operation. 
+        - Time Travel allows you to restore a previous version of a database, table, or schema.
+
+    - Snowflake Caching
+        - Snowflake will use the cached result set if it is still available rather than executing the query you just submitted. 
+        - In addition to retrieving the previous query results from a cache, Snowflake supports other caching techniques. There are three Snowflake caching types: the query result cache, the virtual warehouse cache, and the metadata cache.
+        - The virtual warehouse cache is located in the compute layer. The result cache is located in the cloud services layer. The metadata storage cache layer is located in the cloud services layer.
+        
+        - The fastest way to retrieve data from Snowflake is by using the query result cache.
+        - The results of a Snowflake query are cached, or persisted, for 24 hours and then purged.
+        - Even though the result cache only persists for 24 hours, the clock is reset each time the query is re-executed, up to a maximum of 31 days from the date and time when the query was first executed. After 31 days, or sooner if the underlying data changes, a new result is generated and cached when the query is submitted again.
+        - The result cache is fully managed by the Snowflake global cloud services (GCS) layer, and is available across all virtual warehouses since virtual warehouses have access to all data. 
+        - The process for retrieving cached results is managed by GCS. However, once the size of the results exceeds a certain threshold, the results are stored in and retrieved from cloud storage.
+        - Another unique feature of the query result cache is that it is the only cache that can be disabled by a parameter. 
+
+            ``` sql
+            ALTER SESSION SET USE_CACHED_RESULT=FALSE;
+            ```
+
+        - The metadata cache is fully managed in the global services layer where the user does have some control over the metadata but no control over the cache. Snowflake collects and manages metadata about tables, micro-partitions, and even clustering. 
+        - For tables, Snowflake stores row count, table size in bytes, file references, and table versions. Thus, a running virtual warehouse will not be needed, because the count statistics are kept in the metadata cache when running a SELECT COUNT(*) on a table.
+        - The Snowflake metadata repository includes table definitions and references to the micro-partition files for that table. The range of values in terms of MIN and MAX, the NULL count, and the number of distinct values are captured from micro-partitions and stored in Snowflake.
+        - Snowflake also stores the total number of micro-partitions and the depth of overlapping micro-partitions to provide information about clustering.
+        - The information stored in the metadata cache is used to build thequery execution plan.
+        
+        - The traditional Snowflake data cache is specific to the virtual warehouse used to process the query. 
+        - Running virtual warehouses use SSD storage to store the micro-partitions that are pulled from the centralized database storage layer when a query is processed.
+        - The virtual warehouse data cache is limited in size and uses the LRU (Least Recently Used) algorithm.
+        - The virtual warehouse cache is sometimes referred to as the raw data cache, the SSD cache, or the data cache. 
+        - This cache is dropped once the virtual warehouse is suspended, so you’ll want to consider the trade-off between the credits that will be consumed by keeping a virtual warehouse running and the value from maintaining the cache of data from previous queries to improve performance.
