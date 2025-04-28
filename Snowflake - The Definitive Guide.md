@@ -88,3 +88,26 @@
         - The virtual warehouse data cache is limited in size and uses the LRU (Least Recently Used) algorithm.
         - The virtual warehouse cache is sometimes referred to as the raw data cache, the SSD cache, or the data cache. 
         - This cache is dropped once the virtual warehouse is suspended, so you’ll want to consider the trade-off between the credits that will be consumed by keeping a virtual warehouse running and the value from maintaining the cache of data from previous queries to improve performance.
+
+#### Creating and Managing Snowflake Databases
+    - In a relational environment, database objects such as tables and views are maintained within databases. 
+    - In Snowflake, the database logically groups the data while the schema organizes it. Together, the database and schema comprise the namespace.
+    - We can create two main types of databases: permanent (persistent) and transient. 
+    - At the time we create a database, the default will be a permanent database, if we don’t specify which of the two types we want to create.
+    - Transient databases have a maximum one-day data retention period, aka Time Travel period, and do not have a fail-safe period.
+    - The default Time Travel period is one day but can be up to 90 days for permanent databases; or a user could set the Time Travel period to zero days if no Time Travel period is desired.
+    - Snowflake’s fail-safe data recovery service provides a seven-day period during which data from permanent databases and database objects may be recoverable by Snowflake. 
+    - The fail-safe data recovery period is the seven-day period after the data retention period ends. Unlike Time Travel data, which is accessible by Snowflake users, fail-safe data is recoverable only by Snowflake employees.
+    - SQL commands for Snowflake databases
+    ```sql
+        CREATE DATABASE
+        ALTER DATABASE
+        DROP DATABASE
+        SHOW DATABASES
+    ```
+    - The SNOWFLAKE database is owned by Snowflake Inc. and is a system-defined, read-only, shared database which provides object metadata and usage metrics about your account.
+    - you can store transient tables within a permanent database but you cannot store permanent tables within a transient database.
+    - There is no limit to the number of database objects, schemas, and databases that can be created within a Snowflake account.
+    - For regular schemas, the object owner role can grant object access to other roles and can also grant those roles the ability to manage grants for the object. However, in managed access schemas, object owners are unable to issue grant privileges. Instead, only the schema owner or a role with the MANAGE GRANTS privilege assigned to it can manage the grant privileges.
+    - Two database schemas, are included in every database that is created: INFORMATION_SCHEMA and PUBLIC. 
+    - The PUBLIC schema is the default schema and can be used to create any other objects, whereas the INFORMATION_SCHEMA is a special schema for the system that contains views and table functions which provide access to the metadata for the database and account.
