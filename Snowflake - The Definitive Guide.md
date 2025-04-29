@@ -111,3 +111,56 @@
     - For regular schemas, the object owner role can grant object access to other roles and can also grant those roles the ability to manage grants for the object. However, in managed access schemas, object owners are unable to issue grant privileges. Instead, only the schema owner or a role with the MANAGE GRANTS privilege assigned to it can manage the grant privileges.
     - Two database schemas, are included in every database that is created: INFORMATION_SCHEMA and PUBLIC. 
     - The PUBLIC schema is the default schema and can be used to create any other objects, whereas the INFORMATION_SCHEMA is a special schema for the system that contains views and table functions which provide access to the metadata for the database and account.
+
+    - The INFORMATION_SCHEMA, also known as the Data Dictionary, includes metadata information about the objects within the database as well as account-level objects such as roles.
+    - More than 20 system-defined views are included in every INFORMATION_SCHEMA. These views can be divided into two categories: account views and database views.
+    - INFORMATION_SCHEMA account views include the following:
+        - APPLICABLE_ROLES : Displays one row for each role grant
+        - DATABASES : Displays one row for each database defined in your account
+        - ENABLED_ROLES : Displays one row for each currently enabled role in the session
+        - INFORMATION_SCHEMA_CATALOG_NAME : Displays the name of the database in which the INFORMATION_SCHEMA resides
+        - LOAD_HISTORY : Displays one row for each file loaded into tables using the COPY INTO <table> command, and returns history for all data loaded in the past 14 days except for data loaded using Snowpipe
+        - REPLICATION_DATABASES : Displays one row for each primary and secondary database (i.e., a database for which replication has been enabled) in your organization
+    
+    - INFORMATION_SCHEMA database views include the following views:
+        - COLUMNS : Displays one row for each column in the tables defined in the specified (or current) database.
+        - EXTERNAL_TABLES : Displays one row for each external table in the specified (or current) database.
+        - FILE_FORMATS : Displays one row for each file format defined in the specified (or current) database.
+        - FUNCTIONS : Displays one row for each UDF or external function defined in the specified (or current) database.
+        - OBJECT_PRIVILEGES : Displays one row for each access privilege granted for all objects defined in your account.
+        - PIPES : Displays one row for each pipe defined in the specified (or current) database.
+        - PROCEDURES : Displays one row for each stored procedure defined for the specified (or current) database.
+        - REFERENTIAL_CONSTRAINTS : Displays one row for each referential integrity constraint defined in the specified (or current) database.
+        - SCHEMATA : Displays one row for each schema in the specified (or current) database.
+        - SEQUENCES : Displays one row for each sequence defined in the specified (or current) database.
+        - STAGES : Displays one row for each stage defined in the specified (or current) database.
+        - TABLE_CONSTRAINTS : Displays one row for each referential integrity constraint defined for the tables in the specified (or current) database.
+        - TABLE_PRIVILEGES : Displays one row for each table privilege that has been granted to each role in the specified (or current) database.
+        - TABLE_STORAGE_METRICS : Displays table-level storage utilization information, includes table metadata, and displays the number of storage types billed for each table. Rows are maintained in this view until the corresponding tables are no longer billed for any storage, regardless of various states that the data in the tables may be in (i.e., active, Time Travel, fail-safe, or retained for clones).
+        - TABLES : Displays one row for each table and view in the specified (or current) database.
+        - USAGE_PRIVILEGES : Displays one row for each privilege defined for sequences in the specified (or current) database.
+        - VIEWS : Displays one row for each view in the specified (or current) database.
+
+    - The SNOWFLAKE database, viewable by the ACCOUNTADMIN by default, includes an ACCOUNT_USAGE schema.
+    - The SNOWFLAKE database ACCOUNT_USAGE schema includes records for dropped objects whereas the INFORMATION_SCHEMA does not.
+    - The ACCOUNT_USAGE schema has a longer retention time for historical usage data. Whereas the INFORMATION_SCHEMA has data available ranging from seven days to six months, the ACCOUNT_USAGE view retains historical data for one year.
+    - Most views in the INFORMATION_SCHEMA have no latency, but the latency time for ACCOUNT_USAGE could range from 45 minutes to three hours. Specifically, for the INFORMATION_SCHEMA, there may be a one- to two-hour delay in updating storage-related statistics for ACTIVE_BYTES, TIME_TRAVEL_BYTES, FAILSAFE_BYTES, and RETAINED_FOR_CLONE_BYTES.
+
+    - All Snowflake data is stored in tables. In addition to permanent and transient tables, it is also possible to create hybrid, temporary, and external tables. 
+    - Snowflake hybrid tables support the new Unistore workload. 
+    - Snowflake temporary tables only exist within the session in which they were created and are frequently used for storing transitory data such as ETL data. 
+    - Snowflake external tables give you the ability to directly process or query your data that exists elsewhere without ingesting it into Snowflake, including data that lives in a data lake.
+    - Materialized tables allow users to declaratively specify the pipelines where transformations can occur. Snowflake then handles the incremental refresh to materialize the data.
+    - TRUNCATE and DELETE are different in that TRUNCATE also clears table load history metadata while DELETE retains the metadata.
+
+    - Transient tables are designed for transitory data that needs to be maintained beyond a session but doesn’t need the same level of data recovery as permanent tables. 
+    - As a result, the data storage costs for a transient table would be less than for a permanent table. 
+    - One of the biggest differences between transient tables and permanent tables is that the fail-safe service is not provided for transient tables.
+    - It isn’t possible to change a permanent table to a transient table by using the ALTER command, because the TRANSIENT property is set at table creation time. Likewise, a transient table cannot be converted to a permanent table.
+    
+    - A temporary table, as well as the data within it, is no longer accessible once the session ends. During the time a temporary table exists, it does count toward storage costs; therefore, it is a good practice to drop a temporary table once you no longer need it.
+    - Temporary tables exist only within the session in which they are created. This means they are not available to other users and cannot be cloned.
+
+    - Views are of two types: materialized and nonmaterialized. Whenever the term view is mentioned and the type is not specified, it is understood that it is a nonmaterialized view.
+    - A view is considered to be a virtual table created by a query expression.
+    - Views can provide even more security by creating a specific secure view of either a nonmaterialized or materialized view. 
