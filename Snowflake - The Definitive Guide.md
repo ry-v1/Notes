@@ -164,3 +164,19 @@
     - Views are of two types: materialized and nonmaterialized. Whenever the term view is mentioned and the type is not specified, it is understood that it is a nonmaterialized view.
     - A view is considered to be a virtual table created by a query expression.
     - Views can provide even more security by creating a specific secure view of either a nonmaterialized or materialized view. 
+    - Materialized views are generally used to aggregate as well as filter data so that the results of resource-intensive operations can be stored in a materialized view for improved data performance. The performance improvement is especially good when that same query is used frequently.
+    - Snowflake uses a background service to automatically update materialized views. As a result, data accessed through materialized views is always current, regardless of the amount of DML that has been performed on the base table. 
+    - Snowflake will update the materialized view or use the up-to-date portions of the materialized view and retrieve newer data from the base table if a query is run before the materialized view is up to date.
+    - As a general rule, it is best to use a nonmaterialized view when the results of the view change frequently and the query isn’t so complex and expensive to rerun. Regular views do incur compute costs but not storage costs. The compute cost to refresh the view and the storage cost will need to be weighed against the benefits of a materialized view when the results of a view change often.
+    - A materialized view can query only a single table, and joins are not supported.
+
+    - Stages are Snowflake objects that point to a storage location, either internal to Snowflake or on external cloud storage. 
+    - Internal stage objects can be either named stages or a user or table stage. The temporary keyword can be used to create a session-based named stage object.
+    - Table stages are useful if multiple users need to access the files and those files only need to be copied into a single table, whereas a user stage is best when the files only need to be accessed by one user but will need to be copied into multiple tables.
+    - User stages and table stages, both of which are types of internal stages, are automatically provided for each Snowflake account.
+    - Internal named stages are database objects, which means they can be used not just by one user but by any user who has been granted a role with the appropriate privileges.
+    - When using stages, we can use file formats to store all the format information we need for loading data from files to tables. The default file format is CSV. However, you can create file formats for other formats such as JSON, Avro, ORC, Parquet, and XML.
+
+    - If you need to perform a database operation such as SELECT, DELETE, or CREATE, you’ll need to use a stored procedure. 
+    - If you want to use a function as part of the SQL statement or expression, or if your output needs to include a value for every input row, you’ll want to use a Snowflake UDF.
+    - Secure UDFs are the same as nonsecure UDFs, except that they hide the DDL from the consumer ofthe UDF. Secure UDFs do have limitations on performance functionality due to some optimizations being bypassed. Thus, data privacy versus performance is the consideration because only secure UDFs can be shared.
