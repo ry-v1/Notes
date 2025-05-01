@@ -180,3 +180,14 @@
     - If you need to perform a database operation such as SELECT, DELETE, or CREATE, you’ll need to use a stored procedure. 
     - If you want to use a function as part of the SQL statement or expression, or if your output needs to include a value for every input row, you’ll want to use a Snowflake UDF.
     - Secure UDFs are the same as nonsecure UDFs, except that they hide the DDL from the consumer ofthe UDF. Secure UDFs do have limitations on performance functionality due to some optimizations being bypassed. Thus, data privacy versus performance is the consideration because only secure UDFs can be shared.
+
+    - Pipes are objects that contain a COPY command that is used by Snowpipe. Snowpipe is used for continuous, serverless loading of data into a Snowflake target table. 
+    - Snowflake streams, also known as change data capture (CDC), keep track of certain changes made to a table including inserts, updates, and deletes. 
+    - Snowflake streams have many useful purposes, including recording changes made in a staging table which are used to update another table.
+    - A sequence object is used to generate unique numbers. Often, sequences are used as surrogate keys for primary key values.
+
+    - A Snowflake stream works like a pointer that keeps track of the status of a DML operation on a defined table. 
+    - A Snowflake table stream creates a change table that shows what has changed, at a row level, between two transactional points in time. 
+    - Streams are like processing queues and can be queried just like a table. 
+    - Table streams make it easy to grab the new data in a table so that one can have more efficient processing.
+    - Streams do that by taking a snapshot of all the rows in a table at a point in time and only storing an offset for the source table.
