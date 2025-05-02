@@ -191,3 +191,14 @@
     - Streams are like processing queues and can be queried just like a table. 
     - Table streams make it easy to grab the new data in a table so that one can have more efficient processing.
     - Streams do that by taking a snapshot of all the rows in a table at a point in time and only storing an offset for the source table.
+    - The METADATA$ACTION column tells us whether the row was inserted or deleted. If the row is updated, the METADATA$ISUPDATE column will be TRUE. And lastly, there is a unique hash key for the METADATA$ROW_ID column.
+
+    - Tasks run on a schedule which is defined at the time a task is created. Alternatively, you can establish task dependencies whereby a task can be triggered by a predecessor task. There is no event source that can trigger a task; a task that is not triggered by a predecessor task must be run on a schedule.
+    - Each individual task is limited to a single predecessor task but can have up to 100 child tasks. A task tree is limited to 1,000 tasks in total, including the root task.
+    - The EXECUTE TASK command manually triggers a single run of a scheduled task that is either a standalone task or the root task in a task tree. If it is necessary to recursively resume all dependent tasks tied to a root task, be sure to use the SYSTEM$TASK_DEPENDENTS_ENABLE function, rather than resuming each task individually by using the ALTER TASK RESUME command.
+    - Three Snowflake task functions can be used to retrieve information about tasks:
+        - SYSTEM$CURRENT_USER_TASK_NAME : This function returns the name of the task currently executing when invoked from the statement or stored procedure defined by the task.
+        - TASK_HISTORY : This function returns task activity within the last seven days or the next scheduled execution within the next eight days.
+        - TASK_DEPENDENTS : This is a table function that returns the list of child tasks for a given root task.
+
+    
