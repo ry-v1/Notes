@@ -201,4 +201,67 @@
         - TASK_HISTORY : This function returns task activity within the last seven days or the next scheduled execution within the next eight days.
         - TASK_DEPENDENTS : This is a table function that returns the list of child tasks for a given root task.
 
+    - Data Definition Language (DDL) commands: create, modify, and delete database structures.
+        - CREATE
+        - ALTER
+        - TRUNCATE
+        - RENAME
+        - DROP
+        - DESCRIBE
+        - SHOW
+        - USE
+        - SET/UNSET
+        - COMMENT
+    - Data Control Language (DCL) commands: enable access control.
+        - GRANT
+        - REVOKE
+    - Data Manipulation Language (DML) commands: manipulate the data.
+        - INSERT
+        - MERGE
+        - UPDATE
+        - DELETE
+        - COPY INTO
+        - PUT
+        - GET
+        - LIST
+        - VALIDATE
+        - REMOVE
+    - Transaction Control Language (TCL) commands: manage transaction blocks.
+        - BEGIN
+        - COMMIT
+        - ROLLBACK
+        - CREATE
+    - Data Query Language (DQL) command: either a statement or a clause to retrieve data that meets the criteria specified in the SELECT command.
+        - SELECT
+
+    - Snowflake SQL queries begin with either the WITH clause or the SELECT command.
+    - The WITH clause, an optional clause that precedes the SELECT statement, is used to define common table expressions (CTEs) which are referenced in the FROM clause.
+    - Query syntax  | Query clause | Comments
+        WITH |  | Optional clause that precedes the body of the SELECT statement
+        TOP<n> | |C ontains the maximum number of rows returned, recommended to include ORDER BY
+        FROM AT | BEFORE, CHANGES, CONNECT BY, JOIN, MATCH_RECOGNIZE, PIVOT or UNPIVOT, SAMPLE or TABLESAMPLE_VALUE | Specifies the tables, views, or table functions to use in a SELECT statement
+        WHERE | | Specifies a condition that matches a subset of rows; can filter the result of the FROM clause; can specify which rows to operate on in an UPDATE, MERGE, or DELETE
+        GROUP BY | GROUP BY CUBE, GROUP BY GROUPING SETS, GROUP BY ROLLUP, HAVING | Groups rows with the same group-by-item expressions and computes aggregate functions for resultant group; can be a column name, a number referencing a position in the SELECT list, or expression
+        QUALIFY | | Filters the results of window functions
+        ORDER BY | | Specifies an ordering of the rows of the result table from a SELECT list
+        LIMIT/FETCH | |  Constrains the maximum number of rows returned; recommended to include ORDER BY
     
+    - An uncorrelated subquery is an independent query, one in which the value returned doesn’t depend on any columns of the outer query. An uncorrelated subquery returns a single result that is used by the outer query only once.
+
+    - A correlated subquery references one or more external columns. A correlated subquery is evaluated on each row of the outer query table and returns one result per row that is evaluated.
+
+    - Whenever the same names exist for a CTE and a table or view, the CTE will take precedence. Therefore, it is recommended to always choose a unique name for your CTEs.
+
+    - Arithmetic operators : +, –, * , /, and %
+    - Comparison operators : 
+        - Equal (=)
+        - Not equal (!= or <>)
+        - Less than (<)
+        - Less than or equal (<=)
+        - Greater than (>)
+        - Greater than or equal (>=)
+    - Logical operators : NOT, AND, OR
+    - Subquery operators : [NOT] EXISTS, ANY or ALL, and [NOT] IN
+    - Set operators : INTERSECT, MINUS or EXCEPT, UNION, and UNION ALL - order of preference is INTERSECT as the highest precedence, followed by EXCEPT, MINUS, and UNION, and finally UNION ALL as the lowest precedence.
+
+    - The Snowflake system will cancel long-running queries. The default duration for long-running queries is two days, but the STATEMENT_TIMEOUT_IN_SECONDS duration value can always be set at an account, session, object, or virtual warehouse level.
