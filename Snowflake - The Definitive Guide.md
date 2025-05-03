@@ -236,9 +236,13 @@
 
     - Snowflake SQL queries begin with either the WITH clause or the SELECT command.
     - The WITH clause, an optional clause that precedes the SELECT statement, is used to define common table expressions (CTEs) which are referenced in the FROM clause.
-    - Query syntax  | Query clause | Comments
-        WITH |  | Optional clause that precedes the body of the SELECT statement
-        TOP<n> | |C ontains the maximum number of rows returned, recommended to include ORDER BY
+
+
+        ----------------------------------------------
+        Query syntax  | Query clause | Comments
+        ----------------------------------------------
+        WITH | | Optional clause that precedes the body of the SELECT statement
+        TOP<n> | | Contains the maximum number of rows returned, recommended to include ORDER BY
         FROM AT | BEFORE, CHANGES, CONNECT BY, JOIN, MATCH_RECOGNIZE, PIVOT or UNPIVOT, SAMPLE or TABLESAMPLE_VALUE | Specifies the tables, views, or table functions to use in a SELECT statement
         WHERE | | Specifies a condition that matches a subset of rows; can filter the result of the FROM clause; can specify which rows to operate on in an UPDATE, MERGE, or DELETE
         GROUP BY | GROUP BY CUBE, GROUP BY GROUPING SETS, GROUP BY ROLLUP, HAVING | Groups rows with the same group-by-item expressions and computes aggregate functions for resultant group; can be a column name, a number referencing a position in the SELECT list, or expression
@@ -265,3 +269,46 @@
     - Set operators : INTERSECT, MINUS or EXCEPT, UNION, and UNION ALL - order of preference is INTERSECT as the highest precedence, followed by EXCEPT, MINUS, and UNION, and finally UNION ALL as the lowest precedence.
 
     - The Snowflake system will cancel long-running queries. The default duration for long-running queries is two days, but the STATEMENT_TIMEOUT_IN_SECONDS duration value can always be set at an account, session, object, or virtual warehouse level.
+
+    Fixed-point number data types | Precision | Comments
+    NUMBER | Optional (38, 0) | Numbers up to 38 digits; maximum scale is 37
+    DECIMAL, NUMERIC | Optional (38,0) | Synonymous with NUMBER
+    INT, INTEGER, BIGINT, SMALLINT, TINYINT, BYTEINT | Cannot be specified; always (38,0) | Possible values: -99999999999999999999999999999999999999 to +99999999999999999999999999999999999999 (inclusive)
+
+    Floating-point number data types | Comments
+    FLOAT, FLOAT4, FLOAT8 | Approximately 15 digits Values range from approximately 10-308 to 10+308
+    DOUBLE, DOUBLE PRECISION, REAL | Approximately 15 digits Synonymous with FLOAT
+
+    Text string data types | Parameters | Comments
+    VARCHAR Optional parameter | (N), max number of characters | Holds Unicode characters; no performance difference between using full-length VARCHAR (16,777,216) or a smaller length
+    CHAR, CHARACTERS | | Synonymous with VARCHAR; length is CHAR(1) if not specified
+    STRING, TEXT | | Synonymous with VARCHAR
+
+    Binary string data types | Comments
+    BINARY | Has no notion of Unicode characters, so length is always measured in bytes; if length is not specified, the default is 8 MB (the maximum length)
+    VARBINARY | Synonymous with BINARY
+
+    Date and time data types | Default mapping | Comments
+    DATE | | Single DATE type; most common date forms are accepted; all accepted timestamps are valid inputs with TIME truncated; the associated time is assumed to be midnight
+    DATETIME | | Alias for TIMESTAMP_NTZ
+    TIME | | Single TIME type in the form HH:MI:SS, internally stored as wall clock time; time zones not taken into consideration
+    TIMESTAMP | Default is TIMESTAMP_NTZ | User-specified alias of one of the three TIMESTAMP_ variations
+    TIMESTAMP_LTZ | | Internally UTC time with a specified precision; TIMESTAMP with local time zone
+    TIMESTAMP_NTZ | | Internally wall clock time; TIMESTAMP without time zone
+    TIMESTAMP_TZ | | Internally UTC time with a time zone offset; TIMESTAMP with time zone
+
+    Semi-structured data types | Characteristics | Comments
+    VARIANT | Can store OBJECT and ARRAY | Stores values of any other type, up to a maximum of 16 MB uncompressed; internally stored in compressed columnar binary representation
+    OBJECT | | Represents collections of key-value pairs with the key as a nonempty string and the value of VARIANT type
+    ARRAY | | Represents arrays of arbitrary size whose index is a non-negative integer and values have VARIANT type
+
+    - Using Snowflake, storing and granting access to unstructured data can be done in three different ways: stage file URLs, scoped URLs, or presigned URLs.
+
+    - A stage file URL is used to create a permanent URL to a file on a Snowflake stage and is used most frequently for custom applications.
+    
+    - A scoped URL is frequently used for custom applications; especially in situations where access to the data will be given to other accounts using the data share functionality or when ad hoc analysis is performed internally using Snowsight.
+    - Access to files in a stage using scoped URL access is achieved in one of two ways. One way is for a Snowflake user to click a scoped URL in the results table in Snowsight. The other way is to send the scoped URL in a request which results in Snowflake authenticating the user, verifying the scoped URL has not expired, and then redirecting the user to the staged file in the cloud storage service.
+
+    - A presigned URL is most often used for business intelligence applications or reporting tools that need to display unstructured file contents for open files.
+
+    - Snowflake built-in functions include scalar, aggregate, window, table, and system functions.
