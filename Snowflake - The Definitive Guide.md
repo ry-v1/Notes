@@ -312,3 +312,21 @@
     - A presigned URL is most often used for business intelligence applications or reporting tools that need to display unstructured file contents for open files.
 
     - Snowflake built-in functions include scalar, aggregate, window, table, and system functions.
+
+    - Discretionary access control (DAC) is a security model in which each object has an owner who has control over that object. 
+    - Role-based access control (RBAC) is an approach in which access privileges are assigned to roles and roles are then assigned to one or more users.
+    - Securable object : Entity such as a database or table. Access to a securable object is denied unless specifically granted.
+    - Role : Receives privileges to access and perform operations on an object or to create or alter the access control policies themselves. Roles are assigned to users. Roles can,also be assigned to other roles, creating a role hierarchy.
+    - Privileges : Inherent, assigned, or inherited access to an object.
+    - User : A person, service account, or program that Snowflake recognizes.
+
+    - The account administrator (ACCOUNTADMIN) is at the top level of system-defined account roles and can view and operate on all objects in the account, with one exception. 
+    - The account administrator will have no access to an object when the object is created by a custom role without an assigned system-defined role.
+    - The ACCOUNTADMIN role can stop any running SQL statements and can view and manage Snowflake billing. 
+    - Privileges for resource monitors are unique to the ACCOUNTADMIN role. None of the inherent privileges that come with the resource monitor privileges come with the GRANT option, but the ACCOUNTADMIN can assign the ALTER RESOURCE MONITOR privilege to another role.
+
+    - The security administrator (SECURITYADMIN) is inherently given the MANAGE GRANTS privilege and also inherits all the privileges of the USERADMIN role. The user administrator (USERADMIN) is responsible for creating and managing users and roles.
+    
+    - The system administrator (SYSADMIN) role is a system-defined role with privileges to create virtual warehouses, databases, and other objects in the Snowflake account. The most common roles created by the USERADMIN are assigned to the SYSADMIN role, thus enabling the system or account administrator to manage any of the objects created by custom roles.
+    
+    - The PUBLIC role is automatically granted to every role and every user in the Snowflake account. Just like any other role, the PUBLIC role can own securable objects.
