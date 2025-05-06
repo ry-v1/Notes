@@ -330,3 +330,33 @@
     - The system administrator (SYSADMIN) role is a system-defined role with privileges to create virtual warehouses, databases, and other objects in the Snowflake account. The most common roles created by the USERADMIN are assigned to the SYSADMIN role, thus enabling the system or account administrator to manage any of the objects created by custom roles.
     
     - The PUBLIC role is automatically granted to every role and every user in the Snowflake account. Just like any other role, the PUBLIC role can own securable objects.
+
+    - The most important benefit of batch processing is that it’s typically less expensive than the other types of data processing. It’s less expensive because compute resources are only used when the processing is executed, and since batch processes execute less frequently than near–real-time processing, the overall cost is less. The trade-off, though, is data freshness.
+
+    - Continuous loading has either a small state or no state at all and typically involves relatively simple transformations. Continuous loading is most often used when we need fresh, near–real-time data without needing to know what happened in the last two or three seconds.
+
+    - Snowflake stages are temporary storage spaces used as an intermediate step to lead files to Snowflake tables or to unload data from Snowflake tables into files. 
+    - There are two main types of stages: internal and external. 
+    
+    - For external stages, the files are stored in an external location such as an S3 bucket, and they are referenced by the external stage.
+    
+    - Internal stage types include internal named stages, user stages, and table stages.
+    
+    - Internal named stages are database objects; thus, they can be used by any user who has been granted a role with the appropriate privileges.
+    - SQL statements in which a named stage is referenced will need the @ symbol along with the name of the stage.
+    - To list named stages, you can run the LIST @<stage name> statement.
+
+    - Each Snowflake user has a stage for storing files which is accessible only by that user. A user stage is not a separate database object, and it cannot be altered or dropped.
+    - The data in a user stage is accessible only to the specific user who executed the SQL commands. SQL statements in which a user stage is referenced will need the @~ symbols. The LIST @~ SQL statement can be used to list user stages.
+
+    - A table stage is not a separate database object; rather, it is an implicit stage tied to the table itself. 
+    - Just like user stages, a table stage cannot be altered or dropped. 
+    - Additionally, the data in table stages is accessible only to those Snowflake roles which have been granted the privileges to read from the table. 
+    - SQL statements in which a table stage is referenced will need the @% symbols as well as the name of the table. 
+    - LIST @%<name of table> is the statement you can use to list table stages.
+
+    - Five different ways to load data into Snowflake. 
+        - The first way, is to insert data into tables via SQL command statements in the Snowflake worksheets. 
+        - upload files directly in the web UI. 
+        - SnowSQL CLI, where we’ll use COPY INTO and PUT commands. 
+        - data pipelines and third-party ETL and ELT tools.
