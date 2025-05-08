@@ -360,3 +360,10 @@
         - upload files directly in the web UI. 
         - SnowSQL CLI, where we’ll use COPY INTO and PUT commands. 
         - data pipelines and third-party ETL and ELT tools.
+
+    - ETL can be an ideal solution when the destination requires a specific data format that is different from the pipeline definition.
+    - ELT approach is often the preferred approach when the destination is a cloud native data warehouse.
+
+    - When using Snowflake’s Snowpipe, there are two different mechanisms for detecting when the staged files are available: automate Snowpipe using cloud messaging and call Snowpipe REST endpoints.
+    - As a rule of thumb, the optimal file size for loading into Snowpipe is 100 to 250 MB of compressed data. Try to stage the data within 60-second intervals if the data arrives continuously. Remember, it is possible to create a Snowpipe in such a way that latency can be decreased and throughput can be significantly increased, but the architectural design needs to be weighed against the increased Snowpipe costs that occur as more frequent file ingestions are triggered.
+    - There are a few different considerations when deciding between the two Snowpipe methods of auto-ingest or REST API. In situations where files arrive continuously, you can use Snowflake’s auto-ingest feature to create an event notification. Snowpipe auto-ingest is the more scalable approach. REST API is the better option for use cases in which data arrives randomly and/or if preprocessing needs require using an ETL or ELT tool, or in situations in which an external stage is unavailable.
