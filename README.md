@@ -10,3 +10,4 @@ Notes from the books.
     - SQL Performance Explained
     - Database Internals
     - Snowflake - The Definitive Guide
+    - AI Engineering
