@@ -29,3 +29,15 @@
 
     - A model that can work with more than one data modality is also called a multimodal model. 
     - A generative multimodal model is also called a large multimodal model(LMM).
+
+    - Three Layers of the AI Stack
+        - Application development
+            - With models readily available, anyone can use them to develop applications. This is the layer that has seen the most action in the last two years, and it is still rapidly evolving. Application development involves providing a model with good prompts and necessary context. This layer requires rigorous evaluation. Good applications also demand good interfaces.
+        - Model development
+            - This layer provides tooling for developing models, including frameworks for modeling, training, finetuning, and inference optimization. Because data is central to model development, this layer also contains dataset engineering. Model development also requires rigorous evaluation.
+        - Infrastructure
+            - At the bottom is the stack is infrastructure, which includes tooling for model serving, managing data and compute, and monitoring.
+
+    - Model adaptation techniques can be divided into two categories, depending on whether they require updating model weights.
+        - Prompt-based techniques, which include prompt engineering, adapt a model without updating the model weights.
+        - Finetuning, on the other hand, requires updating model weights.
