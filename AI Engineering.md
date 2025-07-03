@@ -41,3 +41,31 @@
     - Model adaptation techniques can be divided into two categories, depending on whether they require updating model weights.
         - Prompt-based techniques, which include prompt engineering, adapt a model without updating the model weights.
         - Finetuning, on the other hand, requires updating model weights.
+
+    - Model development - is the layer most commonly associated with traditional ML engineering. 
+        - It has three main responsibilities: modeling and training, dataset engineering, and inference optimization.
+        - Modeling and training refers to the process of coming up with a model architecture, training it, and finetuning it.
+        - Dataset engineering. Dataset engineering refers to curating, generating, and annotating the data needed for training and adapting AI models.
+        - Inference optimization means making models faster and cheaper.
+
+    - The application development layer consists of these responsibilities:
+        - Evaluation is about mitigating risks and uncovering opportunities.
+        - Prompt engineering is about getting AI models to express the desirable behaviors from the input alone, without changing the model weights.
+        - AI interface means creating an interface for end users to interact with your AI applications.
+
+    - Transformer architecture
+        - To understand the transformer, let’s look at the problem it was created to solve. The transformer architecture was popularized on the heels of the success of the seq2seq(sequence-to-sequence) architecture.
+        - At a high level, seq2seq contains an encoder that processes inputs and a decoder that generates outputs. Both inputs and outputs are sequences of tokens, hence the name. Seq2seq uses RNNs (recurrent neural networks) as its encoder and decoder. In its most basic form, the encoder processes the input tokens sequentially, outputting the final hidden state that represents the input. The decoder then generates output tokens sequentially, conditioned on both the final hidden state of the input and the previously generated token.
+        - There are two problems with seq2seq. First, the vanilla seq2seq decoder generates output tokens using only the final hidden state of the input. Intuitively, this is like generating answers about a book using the book summary. This limits the quality of the generated outputs. Second, the RNN encoder and decoder mean that both input processing and output generation are done sequentially, making it slow for long sequences. If an input is 200 tokens long, seq2seq has to wait for each input token to finish processing before moving on to the next.
+        - The transformer architecture addresses both problems with the attention mechanism. 
+        - The attention mechanism allows the model to weigh the importance of different input tokens when generating each output token.
+        - The transformer architecture dispenses with RNNs entirely. With transformers, the input tokens can be processed in parallel, significantly speeding up input processing. - While the transformer removes the sequential input bottleneck, transformer-based autoregressive language models still have the sequential output bottleneck.
+        
+        - Inference for transformer-based language models, consists of two steps:
+            - Prefill - The model processes the input tokens in parallel. This step creates the intermediate state necessary to generate the first output token. This intermediate state includes the key and value vectors for all input tokens.
+            - Decode - The model generates one output token at a time.
+
+        - Attention mechanism - Under the hood, the attention mechanism leverages key, value, and query vectors:
+            • The query vector (Q) represents the current state of the decoder at each decoding step. Using the same book summary example, this query vector can be thought of
+            as the person looking for information to create a summary.
+            • Each key vector (K) represents a previous token. If each previous token is a page in the book, each key vector is like the page number. Note that at a given decoding step, previous tokens include both input tokens and previously generated tokens.
