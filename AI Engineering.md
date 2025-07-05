@@ -69,3 +69,24 @@
             • The query vector (Q) represents the current state of the decoder at each decoding step. Using the same book summary example, this query vector can be thought of
             as the person looking for information to create a summary.
             • Each key vector (K) represents a previous token. If each previous token is a page in the book, each key vector is like the page number. Note that at a given decoding step, previous tokens include both input tokens and previously generated tokens.
+            • Each value vector (V) represents the actual value of a previous token, as learned by the model. Each value vector is like the page’s content.
+            
+            - The attention mechanism computes how much attention to give an input token by performing a dot product between the query vector and its key vector. A high score means that the model will use more of that page’s content (its value vector) when generating the book’s summary.
+
+        - Transformer block
+            - A transformer architecture is composed of multiple transformer blocks. The exact content of the block varies between models, but, in general, each transformer block contains the attention module and the MLP (multi-layer perceptron) module:
+                - Attention module
+                    - Each attention module consists of four weight matrices: query, key, value, and output projection.
+                - MLP module
+                    - An MLP module consists of linear layers separated by nonlinear activation functions. Each linear layer is a weight matrix that is used for linear transformations, whereas an activation function allows the linear layers to learn nonlinear patterns. A linear layer is also called a feedforward layer.
+
+            - The number of transformer blocks in a transformer model is often referred to as that model’s number of layers.
+
+        - A more standardized unit for a model’s compute requirement is FLOP, or floating point operation. FLOP measures the number of floating point operations performed for a certain task.
+
+        - The plural form of FLOP, FLOPs, is often confused with FLOP/s, floating point operations per Second. FLOPs measure the compute requirement for a task, whereas FLOP/s measures a machine’s peak performance.
+
+        - Three numbers signal a model’s scale:
+            • Number of parameters, which is a proxy for the model’s learning capacity.
+            • Number of tokens a model was trained on, which is a proxy for how much a model learned.
+            • Number of FLOPs, which is a proxy for the training cost.
