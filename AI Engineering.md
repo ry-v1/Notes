@@ -90,3 +90,12 @@
             • Number of parameters, which is a proxy for the model’s learning capacity.
             • Number of tokens a model was trained on, which is a proxy for how much a model learned.
             • Number of FLOPs, which is a proxy for the training cost.
+
+        - A parameter can be learned by the model during the training process. 
+        - A hyperparameter is set by users to configure the model and control how the model learns.
+        - Hyperparameters to configure the model include the number of layers, the model dimension, and vocabulary size. 
+        - Hyperparameters to control how a model learns include batch size, number of epochs, learning rate, per-layer initial variance, and more.
+
+    - Post-training consists of two steps:
+        - Supervised finetuning (SFT): Finetune the pre-trained model on high-quality instruction data to optimize models for conversations instead of completion.
+        - Preference finetuning: Further finetune the model to output responses that align with human preference. Preference finetuning is typically done with reinforcement learning (RL).
