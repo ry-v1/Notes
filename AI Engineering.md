@@ -99,3 +99,27 @@
     - Post-training consists of two steps:
         - Supervised finetuning (SFT): Finetune the pre-trained model on high-quality instruction data to optimize models for conversations instead of completion.
         - Preference finetuning: Further finetune the model to output responses that align with human preference. Preference finetuning is typically done with reinforcement learning (RL).
+
+
+### RAG and Agents
+
+    - Two dominating patterns for context construction are RAG, or retrieval-augmented generation, and agents.
+
+    - The RAG pattern allows the model to retrieve relevant information from external data sources. 
+    - The agentic pattern allows the model to use tools such as web search and news APIs to gather information.
+
+    - RAG Architecture
+        - A RAG system has two components: a retriever that retrieves information from external memory sources and a generator that generates a response based on the retrieved information.
+        - The success of a RAG system depends on the quality of its retriever. 
+        - A retriever has two main functions: indexing and querying. 
+        - Indexing involves processing data so that it can be quickly retrieved later. 
+        - Sending a query to retrieve data relevant to it is called querying. 
+        - How to index data depends on how you want to retrieve it later on.
+        - Naively retrieving whole documents can cause your context to be arbitrarily long. To avoid this, you can split each document into more manageable chunks.
+        - For each query, our goal is to retrieve the data chunks most relevant to this query. 
+        - Minor post-processing is often needed to join the retrieved data chunks with the user prompt to generate the final prompt. 
+        - This final prompt is then fed into the generative model.
+        - Retrieval is typically limited to one database or system, whereas search involves retrieval across various systems.
+        - At its core, retrieval works by ranking documents based on their relevance to a given query. Retrieval algorithms differ based on how relevance scores are computed.
+
+        - Sparse retrievers represent data using sparse vectors. A sparse vector is a vector where the majority of the values are 0. Term-based retrieval is considered sparse, as each term can be represented using a sparse one-hot vector, a vector that is 0 everywhere except one value of 1. The vector size is the length of the vocabulary. The value of 1 is in the index corresponding to the index of the term in the vocabulary.
